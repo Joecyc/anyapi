@@ -1,0 +1,2193 @@
+// order-api.scss — Order Integration wizard and list styles
+
+/* --------------------------------------------------------------------------
+   Variables (shared with Dashboard)
+   -------------------------------------------------------------------------- */
+/* Order API inherits --anyapi-* tokens from ui-dashboard.scss :root.
+   No local :root redeclaration — ensures dark mode CSS variables propagate
+   correctly when body.dark-mode is set by anyapi-db.js. */
+:root {
+  /* legacy fallbacks only — overridden by --anyapi-* at runtime */
+  --code-bg: #1e293b;
+  --code-text: #e2e8f0;
+  --shadow-float: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   Layout
+   -------------------------------------------------------------------------- */
+#anyapi-integration {
+  background: var(--anyapi-bg);
+  min-height: 100vh;
+  padding: 32px 24px;
+}
+
+.integration-main-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .integration-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .steps-sidebar {
+    order: -1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar
+   -------------------------------------------------------------------------- */
+.steps-sidebar {
+  background: var(--anyapi-card);
+  border-radius: var(--anyapi-radius);
+  padding: 24px 16px;
+  box-shadow: var(--anyapi-shadow);
+  border: 1px solid var(--anyapi-border);
+  position: sticky;
+  top: 32px;
+}
+
+.progress-bar-container {
+  margin-bottom: 20px;
+  padding: 0 8px;
+}
+.progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--anyapi-primary), #ec4899);
+  transition: width 0.5s ease;
+  border-radius: 3px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--anyapi-radius-sm);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: var(--anyapi-text-muted);
+  font-size: 14px;
+}
+
+.step-item:hover,
+.step-item.active {
+  background: rgba(93, 95, 239, 0.08);
+  color: var(--anyapi-primary);
+}
+
+.step-item.active {
+  transform: translateX(4px);
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #64748b;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.step-item.active .step-number {
+  background: var(--anyapi-primary);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(93, 95, 239, 0.08);
+}
+
+.step-item.complete .step-number {
+  background: var(--anyapi-success);
+  color: white;
+}
+
+.step-label {
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Content panel
+   -------------------------------------------------------------------------- */
+.integration-content {
+  background: var(--anyapi-card);
+  border-radius: var(--anyapi-radius);
+  padding: 40px;
+  box-shadow: var(--shadow-float);
+  border: 1px solid var(--anyapi-border);
+}
+
+.step-panel {
+  display: none;
+}
+.step-panel.active {
+  display: block;
+}
+
+.panel-header {
+  margin-bottom: 32px;
+}
+.panel-header h2 {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.3;
+  padding-bottom: 4px;
+  background: linear-gradient(90deg, var(--anyapi-primary), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.description {
+  color: var(--anyapi-text-muted);
+  font-size: 15px;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Form elements
+   -------------------------------------------------------------------------- */
+.form-group {
+  margin-bottom: 28px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--anyapi-text);
+  font-size: 14px;
+}
+.required {
+  color: var(--anyapi-danger);
+}
+.help-text {
+  color: var(--anyapi-text-muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+.help-text code {
+  background: rgba(93, 95, 239, 0.08);
+  color: var(--anyapi-primary);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.widefat,
+select.widefat {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  font-size: 15px;
+  background: var(--anyapi-card);
+  color: var(--anyapi-text);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.widefat:focus,
+select.widefat:focus {
+  outline: none;
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.08);
+}
+
+.code-textarea {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.error-message {
+  color: var(--anyapi-danger);
+  font-size: 13px;
+  margin-top: 6px;
+  min-height: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   Action tiles (Step 2)
+   -------------------------------------------------------------------------- */
+.action-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.action-tile {
+  background: var(--anyapi-card);
+  border: 2px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  padding: 24px 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.action-tile:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.08);
+  transform: translateY(-3px);
+}
+
+.action-tile.active {
+  border-color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  box-shadow: 0 0 0 4px rgba(93, 95, 239, 0.08);
+}
+
+.tile-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+.action-tile h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+.action-tile p {
+  margin: 0;
+  color: var(--anyapi-text-muted);
+  font-size: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   Step 3: Filter Mode Selector
+   -------------------------------------------------------------------------- */
+.filter-mode-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.filter-mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px;
+  border: 2px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  background: var(--anyapi-card);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.filter-mode-btn:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  background: rgba(93, 95, 239, 0.08);
+}
+
+.filter-mode-btn.active {
+  border-color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.mode-icon {
+  font-size: 28px;
+}
+.mode-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--anyapi-text);
+}
+.mode-desc {
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Step 3: Mode sections
+   -------------------------------------------------------------------------- */
+.mode-section {
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Basic mode info box */
+.basic-mode-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--anyapi-radius-sm);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.info-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.basic-mode-info p {
+  margin: 4px 0 0;
+  color: var(--anyapi-text-muted);
+  font-size: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Step 3: Search + Tag
+   -------------------------------------------------------------------------- */
+.field-search-wrapper {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.search-input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--anyapi-card);
+  border: 2px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  padding: 10px 16px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.search-input-group:focus-within {
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.08);
+}
+
+.search-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.field-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  background: transparent;
+  color: var(--anyapi-text);
+}
+.field-search-input::placeholder {
+  color: var(--anyapi-text-muted);
+}
+
+/* Dropdown results */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  box-shadow: var(--shadow-float);
+  z-index: 100;
+  overflow: hidden;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 14px;
+}
+
+.search-result-item:hover {
+  background: rgba(93, 95, 239, 0.08);
+}
+.search-result-item.is-selected {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.result-path {
+  flex: 1;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  color: var(--anyapi-text);
+}
+.result-path mark {
+  background: rgba(124, 58, 237, 0.2);
+  color: var(--anyapi-primary);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.result-group {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.result-add,
+.result-check {
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+.result-add {
+  color: var(--anyapi-primary);
+}
+.result-check {
+  color: var(--anyapi-success);
+}
+
+.search-no-results {
+  padding: 20px;
+  text-align: center;
+  color: var(--anyapi-text-muted);
+  font-size: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Step 3: Two-column grid (selected + preview)
+   -------------------------------------------------------------------------- */
+.step3-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 960px) {
+  .step3-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.selected-fields-panel,
+.json-preview-panel {
+  background: var(--anyapi-bg);
+  border-radius: var(--anyapi-radius);
+  padding: 20px;
+  border: 1.5px solid var(--anyapi-border);
+}
+
+.panel-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.panel-title-row h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--anyapi-primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
+.preview-badge {
+  font-size: 11px;
+  color: var(--anyapi-success);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Selected fields list */
+.selected-fields-list {
+  min-height: 120px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--anyapi-primary) transparent;
+}
+
+.selected-fields-list::-webkit-scrollbar {
+  width: 6px;
+}
+.selected-fields-list::-webkit-scrollbar-thumb {
+  background: var(--anyapi-primary);
+  border-radius: 3px;
+}
+
+.no-fields-hint {
+  color: var(--anyapi-text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 8px;
+  margin: 0;
+}
+
+/* Selected field row */
+.selected-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  cursor: grab;
+  transition: all 0.15s;
+  font-size: 13px;
+}
+
+.selected-field:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+}
+.selected-field.dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
+}
+.selected-field.drag-over {
+  border-color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+}
+
+/* Array-type field indicator */
+.selected-field.is-array {
+  border-left: 3px solid #ec4899;
+}
+
+.drag-handle {
+  color: var(--anyapi-text-muted);
+  cursor: grab;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+.field-path {
+  flex: 1;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  color: var(--anyapi-text);
+}
+
+.field-group-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.remove-field {
+  background: var(--anyapi-danger);
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.remove-field:hover {
+  background: #dc2626;
+}
+
+/* Clear all button */
+.button-clear-all {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: var(--anyapi-danger);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.button-clear-all:hover {
+  background: #dc2626;
+}
+
+/* JSON preview box */
+.json-preview-box {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 16px;
+  border-radius: var(--anyapi-radius-sm);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 320px;
+  white-space: pre-wrap;
+  scrollbar-width: thin;
+  scrollbar-color: var(--anyapi-primary) #0f172a;
+}
+
+.json-preview-box::-webkit-scrollbar {
+  width: 6px;
+}
+.json-preview-box::-webkit-scrollbar-track {
+  background: #0f172a;
+  border-radius: 3px;
+}
+.json-preview-box::-webkit-scrollbar-thumb {
+  background: var(--anyapi-primary);
+  border-radius: 3px;
+}
+
+.json-preview-box--live {
+  margin-top: 0;
+}
+
+/* Expert mode divider */
+.expert-mode-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 16px;
+  color: var(--anyapi-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.expert-mode-divider::before,
+.expert-mode-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--anyapi-border);
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.button-hero {
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--anyapi-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.button-primary.button-hero {
+  background: var(--anyapi-primary);
+  color: white;
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.22);
+}
+
+.button-primary.button-hero:hover {
+  background: var(--anyapi-primary-hover);
+  border-color: var(--anyapi-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(124, 58, 237, 0.32);
+}
+
+.button-hero:not(.button-primary) {
+  background: transparent;
+  color: var(--anyapi-text-muted);
+  border-color: var(--anyapi-border);
+}
+
+.button-hero:not(.button-primary):hover {
+  color: var(--anyapi-text);
+  border-color: var(--anyapi-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Step 4: Summary
+   -------------------------------------------------------------------------- */
+.step4-wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.step4-header {
+  margin-bottom: 32px;
+}
+.step4-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+}
+.step4-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.3;
+  padding-bottom: 4px;
+  background: linear-gradient(90deg, var(--anyapi-primary), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 8px;
+}
+
+/* Summary cards grid */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0 0 28px;
+  text-align: left;
+}
+
+.summary-card--full {
+  grid-column: 1 / -1;
+}
+
+.summary-card {
+  background: var(--anyapi-bg);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.summary-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--anyapi-text);
+  word-break: break-all;
+}
+
+.summary-value--url {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  color: var(--anyapi-primary);
+}
+
+/* Save status */
+.save-status {
+  padding: 12px 18px;
+  border-radius: var(--anyapi-radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.save-status--success {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #065f46;
+}
+
+.save-status--error {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #991b1b;
+}
+
+/* Step 4 actions */
+.step4-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.button-save {
+  min-width: 160px;
+}
+
+.step4-hint {
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .integration-content {
+    padding: 24px;
+  }
+  .filter-mode-selector {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .step3-grid {
+    grid-template-columns: 1fr;
+  }
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .summary-card--full {
+    grid-column: auto;
+  }
+  .action-tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .action-tiles {
+    grid-template-columns: 1fr;
+  }
+  .filter-mode-selector {
+    grid-template-columns: 1fr;
+  }
+  .step4-actions {
+    flex-direction: column;
+  }
+}
+
+/* ==========================================================================
+   PLAN-AWARE UI — Locks, Usage Meter, Upgrade Modal, Inline CTAs
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Locked state — tiles and mode buttons
+   -------------------------------------------------------------------------- */
+.action-tile.is-locked,
+.filter-mode-btn.is-locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.action-tile.is-locked:hover,
+.filter-mode-btn.is-locked:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--anyapi-border);
+  background: var(--anyapi-card);
+}
+
+/* Lock badge on tiles */
+.tile-lock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--anyapi-primary);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(93, 95, 239, 0.22);
+}
+
+/* Lock badge on mode buttons */
+.mode-lock-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(93, 95, 239, 0.08);
+  color: var(--anyapi-primary);
+  padding: 1px 6px;
+  border-radius: 20px;
+  border: 1px solid rgba(93, 95, 239, 0.22);
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* --------------------------------------------------------------------------
+   Label row (label + usage pill side by side)
+   -------------------------------------------------------------------------- */
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.label-row label {
+  margin-bottom: 0;
+}
+
+/* Usage pill (e.g. "1 / 1 keys used") */
+.usage-pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.usage-pill.is-maxed {
+  background: rgba(239, 68, 68, 0.08);
+  color: #991b1b;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+/* Inline limit warning under a locked field */
+.limit-warning {
+  font-size: 13px;
+  color: var(--anyapi-danger);
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+.limit-warning a {
+  color: var(--anyapi-primary);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar: Monthly usage meter
+   -------------------------------------------------------------------------- */
+.sidebar-usage-meter {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: var(--anyapi-bg);
+  border-radius: var(--anyapi-radius-sm);
+  border: 1px solid var(--anyapi-border);
+}
+
+.usage-meter__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.usage-meter__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+}
+.usage-meter__count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--anyapi-text);
+}
+
+.usage-meter__bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.usage-meter__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--anyapi-primary), #a78bfa);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+.usage-meter__fill.is-warn {
+  background: linear-gradient(90deg, var(--anyapi-warn), #fbbf24);
+}
+/* is-throttling → violet (align with Dashboard alert bar) */
+.usage-meter__fill.is-throttling {
+  background: linear-gradient(90deg, #7c3aed, #6d28d9);
+}
+
+.usage-meter__note {
+  font-size: 11px;
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+.usage-meter__note.is-throttling {
+  color: #7c3aed;
+}
+
+.usage-meter__cta {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--anyapi-primary);
+  text-decoration: none;
+  text-align: center;
+  padding: 5px 0;
+  background: rgba(93, 95, 239, 0.08);
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.usage-meter__cta:hover {
+  background: rgba(124, 58, 237, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar: Plan badge
+   -------------------------------------------------------------------------- */
+.sidebar-plan-badge {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sidebar-plan-badge a {
+  color: var(--anyapi-primary);
+  font-weight: 700;
+}
+
+.plan-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.plan-badge--starter .plan-badge__dot {
+  background: var(--anyapi-text-muted);
+}
+.plan-badge--lite .plan-badge__dot {
+  background: var(--anyapi-primary);
+}
+.plan-badge--plus .plan-badge__dot {
+  background: var(--anyapi-success);
+}
+.plan-badge--agency .plan-badge__dot {
+  background: var(--anyapi-warn);
+}
+
+/* --------------------------------------------------------------------------
+   Inline plan nudges (Step 2 & Step 3)
+   -------------------------------------------------------------------------- */
+.plan-inline-note {
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  font-style: italic;
+}
+
+.plan-inline-upgrade {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: rgba(93, 95, 239, 0.08);
+  border: 1px solid rgba(93, 95, 239, 0.22);
+  border-radius: var(--anyapi-radius-sm);
+  padding: 12px 16px;
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: var(--anyapi-text);
+}
+
+.btn-inline-upgrade {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  background: var(--anyapi-primary);
+  padding: 5px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-inline-upgrade:hover {
+  background: var(--anyapi-primary-hover);
+}
+
+/* Step 3: JSON filter upgrade nudge box */
+.filter-upgrade-nudge {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.06),
+    rgba(236, 72, 153, 0.04)
+  );
+  border: 1.5px solid rgba(93, 95, 239, 0.22);
+  border-radius: var(--anyapi-radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.nudge-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.nudge-body {
+  flex: 1;
+}
+.nudge-body strong {
+  font-size: 15px;
+  color: var(--anyapi-text);
+}
+.nudge-body p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+}
+
+.btn-nudge-upgrade {
+  flex-shrink: 0;
+  align-self: center;
+  background: var(--anyapi-primary);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: var(--anyapi-radius-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
+  transition: all 0.2s;
+}
+.btn-nudge-upgrade:hover {
+  background: var(--anyapi-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   Upgrade Modal
+   -------------------------------------------------------------------------- */
+.upgrade-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.upgrade-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.upgrade-modal__box {
+  position: relative;
+  background: var(--anyapi-card);
+  border-radius: 24px;
+  padding: 40px 36px;
+  max-width: 680px;
+  width: 100%;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.upgrade-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--anyapi-bg);
+  border: 1px solid var(--anyapi-border);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--anyapi-text-muted);
+  transition: all 0.15s;
+}
+.upgrade-modal__close:hover {
+  background: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+.upgrade-modal__icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+}
+
+.upgrade-modal__title {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.3;
+  padding-bottom: 4px;
+  background: linear-gradient(90deg, var(--anyapi-primary), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 8px;
+}
+
+.upgrade-modal__body {
+  font-size: 15px;
+  color: var(--anyapi-text-muted);
+  margin: 0 0 28px;
+}
+
+/* Plan comparison in modal */
+.upgrade-modal__plans {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.modal-plan--plus {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .upgrade-modal__plans {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modal-plan {
+  background: var(--anyapi-bg);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  padding: 18px 16px;
+  position: relative;
+}
+
+.modal-plan--current {
+  opacity: 0.65;
+}
+
+.modal-plan--highlight {
+  border-color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.modal-plan__badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--anyapi-text-muted);
+  margin-bottom: 8px;
+}
+.modal-plan__badge--pro {
+  color: var(--anyapi-primary);
+}
+
+.modal-plan__name {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--anyapi-text);
+  margin-bottom: 2px;
+}
+
+.modal-plan__price {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--anyapi-primary);
+  margin-bottom: 12px;
+}
+.modal-plan__price span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--anyapi-text-muted);
+}
+
+.modal-plan__features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.modal-plan__features .feat--yes {
+  color: var(--anyapi-text);
+}
+.modal-plan__features .feat--yes::before {
+  content: "✓ ";
+  color: var(--anyapi-success);
+  font-weight: 700;
+}
+.modal-plan__features .feat--no {
+  color: var(--anyapi-text-muted);
+}
+.modal-plan__features .feat--no::before {
+  content: "✗ ";
+  color: var(--anyapi-danger);
+}
+
+/* CTA button in modal */
+.upgrade-modal__cta {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--anyapi-primary), #a855f7);
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 14px 36px;
+  border-radius: var(--anyapi-radius-sm);
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.upgrade-modal__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.45);
+}
+
+.upgrade-modal__note {
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Utility + Integration List Table
+   -------------------------------------------------------------------------- */
+
+/* is-hidden utility — required for list/empty state toggle */
+.is-hidden {
+  display: none !important;
+}
+
+.order-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.order-page-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  color: var(--anyapi-text);
+}
+.order-page-desc {
+  font-size: 14px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+}
+
+.oi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--anyapi-card);
+  border-radius: var(--anyapi-radius);
+  overflow: hidden;
+  box-shadow: var(--anyapi-shadow);
+  border: 1px solid var(--anyapi-border);
+  margin-bottom: 24px;
+}
+.oi-table th {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--anyapi-text-muted);
+  background: var(--anyapi-bg);
+  border-bottom: 1px solid var(--anyapi-border);
+  text-align: left;
+}
+.oi-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--anyapi-border);
+  color: var(--anyapi-text);
+  vertical-align: middle;
+}
+.oi-row:last-child td {
+  border-bottom: none;
+}
+.oi-row:hover td {
+  background: rgba(124, 58, 237, 0.02);
+}
+.oi-row.is-inactive td {
+  opacity: 0.5;
+}
+
+.oi-col-name strong {
+  display: block;
+  font-weight: 700;
+  font-size: 13px;
+}
+.oi-key-badge {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--anyapi-text-muted);
+  margin-top: 2px;
+}
+.oi-col-url code {
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--anyapi-text-muted);
+  background: var(--anyapi-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.oi-col-actions {
+  white-space: nowrap;
+}
+
+.oi-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.oi-toggle__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.oi-toggle__track {
+  width: 36px;
+  height: 20px;
+  background: #cbd5e1;
+  border-radius: 10px;
+  transition: background 0.2s;
+  position: relative;
+}
+.oi-toggle__track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.oi-toggle__input:checked + .oi-toggle__track {
+  background: var(--anyapi-success);
+}
+.oi-toggle__input:checked + .oi-toggle__track::after {
+  transform: translateX(16px);
+}
+
+.oi-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--anyapi-radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-decoration: none;
+}
+.oi-btn--primary {
+  background: linear-gradient(135deg, var(--anyapi-primary), #a855f7);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.25);
+}
+.oi-btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+  color: #fff;
+}
+.oi-btn--ghost {
+  background: transparent;
+  color: var(--anyapi-text);
+  border: 1.5px solid var(--anyapi-border);
+}
+.oi-btn--ghost:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+}
+.oi-btn--danger-ghost {
+  background: transparent;
+  color: var(--anyapi-danger);
+  border: 1.5px solid rgba(239, 68, 68, 0.3);
+}
+.oi-btn--danger-ghost:hover {
+  background: rgba(239, 68, 68, 0.05);
+}
+.oi-btn--sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.oi-btn--hero {
+  padding: 14px 32px;
+  font-size: 16px;
+}
+
+.oi-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 24px;
+  text-align: center;
+  background: var(--anyapi-card);
+  border-radius: var(--anyapi-radius);
+  border: 1.5px dashed var(--anyapi-border);
+  margin-bottom: 24px;
+}
+.oi-empty__icon {
+  font-size: 48px;
+  opacity: 0.4;
+}
+.oi-empty h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--anyapi-text);
+  margin: 0;
+}
+.oi-empty p {
+  font-size: 14px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+  max-width: 360px;
+}
+
+.usage-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(93, 95, 239, 0.08);
+  color: var(--anyapi-primary);
+  border: 1px solid rgba(93, 95, 239, 0.22);
+}
+.usage-pill.is-maxed {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--anyapi-danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.api-key-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.api-key-select-row select {
+  flex: 1;
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.label-row label {
+  margin-bottom: 0;
+}
+
+.limit-warning {
+  font-size: 12px;
+  color: var(--anyapi-danger);
+  margin-top: 6px;
+  font-weight: 600;
+}
+.limit-warning a {
+  color: var(--anyapi-primary);
+}
+
+.save-status {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--anyapi-radius-sm);
+  margin-top: 12px;
+}
+.save-status--success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #065f46;
+}
+.save-status--error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
+}
+
+.integration-wizard {
+  margin-top: 24px;
+}
+.integration-wizard.is-hidden {
+  display: none !important;
+}
+
+.wizard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.wizard-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--anyapi-text);
+}
+
+/* ==========================================================================
+   DARK MODE — body.dark-mode overrides
+   ========================================================================== */
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.dark-mode #anyapi-order-page {
+  background: var(--anyapi-bg);
+  color: var(--anyapi-text);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.dark-mode .steps-sidebar {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .step-item {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .step-item:hover,
+.dark-mode .step-item.active {
+  background: rgba(129, 140, 248, 0.08);
+}
+
+.dark-mode .step-number {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .step-item.active .step-number {
+  background: var(--anyapi-primary);
+  border-color: var(--anyapi-primary);
+  color: #fff;
+}
+
+.dark-mode .step-item.complete .step-number {
+  background: var(--anyapi-success);
+  border-color: var(--anyapi-success);
+  color: #fff;
+}
+
+.dark-mode .step-label {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .step-item.active .step-label {
+  color: var(--anyapi-primary);
+  font-weight: 700;
+}
+
+/* ── Progress bar track ───────────────────────────────────────────────────── */
+.dark-mode .progress-bar {
+  background: var(--anyapi-bg2);
+}
+
+/* ── Sidebar usage meter ──────────────────────────────────────────────────── */
+.dark-mode .sidebar-usage-meter {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .usage-meter__label {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .usage-meter__count {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .usage-meter__bar {
+  background: var(--anyapi-bg2);
+  border: 1px solid var(--anyapi-border);
+}
+
+/* Throttle state — violet in dark */
+.dark-mode .usage-meter__fill.is-throttling {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.dark-mode .usage-meter__note.is-throttling {
+  color: #a78bfa;
+}
+
+.dark-mode .usage-meter__cta {
+  color: var(--anyapi-primary);
+}
+.dark-mode .usage-meter__cta:hover {
+  color: var(--anyapi-primary-hover);
+}
+
+/* ── Sidebar plan badge ───────────────────────────────────────────────────── */
+.dark-mode .sidebar-plan-badge {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .sidebar-plan-badge.plan-badge--starter .plan-badge__dot {
+  background: var(--anyapi-text-muted);
+}
+
+.dark-mode .sidebar-plan-badge.plan-badge--lite .plan-badge__dot {
+  background: var(--anyapi-success);
+}
+
+.dark-mode .sidebar-plan-badge.plan-badge--plus .plan-badge__dot,
+.dark-mode .sidebar-plan-badge.plan-badge--agency .plan-badge__dot {
+  background: var(--anyapi-primary);
+}
+
+.dark-mode .sidebar-plan-badge a {
+  color: var(--anyapi-primary);
+}
+
+/* ── Main content panel ───────────────────────────────────────────────────── */
+.dark-mode .integration-content {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .step-panel.active {
+  background: var(--anyapi-card);
+}
+
+.dark-mode .panel-header h2 {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .panel-header p.description,
+.dark-mode .plan-inline-note {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Form groups ─────────────────────────────────────────────────────────── */
+.dark-mode .form-group label {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .widefat,
+.dark-mode .code-textarea {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .widefat:focus,
+.dark-mode .code-textarea:focus {
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px var(--anyapi-primary-glow);
+}
+
+.dark-mode .widefat::placeholder,
+.dark-mode .code-textarea::placeholder {
+  color: var(--anyapi-text-muted);
+  opacity: 0.6;
+}
+
+.dark-mode .help-text {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Action tiles (Step 2 triggers) ──────────────────────────────────────── */
+.dark-mode .action-tile {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .action-tile:hover {
+  border-color: rgba(129, 140, 248, 0.4);
+  background: rgba(129, 140, 248, 0.07);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.08);
+}
+
+.dark-mode .action-tile.active {
+  border-color: var(--anyapi-primary);
+  background: rgba(129, 140, 248, 0.1);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.12);
+}
+
+.dark-mode .action-tile h3 {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .action-tile p {
+  color: var(--anyapi-text-muted);
+}
+
+/* locked tiles */
+.dark-mode .action-tile.is-locked,
+.dark-mode .filter-mode-btn.is-locked {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  opacity: 0.55;
+}
+
+.dark-mode .action-tile.is-locked:hover,
+.dark-mode .filter-mode-btn.is-locked:hover {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  box-shadow: none;
+}
+
+/* ── Plan inline upgrade banner (Step 2) ─────────────────────────────────── */
+.dark-mode .plan-inline-upgrade {
+  background: rgba(129, 140, 248, 0.07);
+  border-color: rgba(129, 140, 248, 0.2);
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .btn-inline-upgrade {
+  color: #fff;
+}
+.dark-mode .btn-inline-upgrade:hover {
+  color: #fff;
+}
+
+/* ── Filter mode buttons (Step 3) ────────────────────────────────────────── */
+.dark-mode .filter-mode-btn {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .filter-mode-btn:hover {
+  border-color: rgba(129, 140, 248, 0.35);
+  background: rgba(129, 140, 248, 0.07);
+}
+
+.dark-mode .filter-mode-btn.active {
+  border-color: var(--anyapi-primary);
+  background: rgba(129, 140, 248, 0.1);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+.dark-mode .mode-label {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .mode-desc {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Filter upgrade nudge (Step 3) ───────────────────────────────────────── */
+.dark-mode .filter-upgrade-nudge {
+  background: rgba(129, 140, 248, 0.07);
+  border-color: rgba(129, 140, 248, 0.2);
+}
+
+.dark-mode .nudge-body strong {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .nudge-body p {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .btn-nudge-upgrade {
+  background: var(--anyapi-primary);
+  color: #fff;
+}
+.dark-mode .btn-nudge-upgrade:hover {
+  background: var(--anyapi-primary-hover);
+}
+
+/* ── Basic mode info box ─────────────────────────────────────────────────── */
+.dark-mode .basic-mode-info {
+  background: rgba(0, 212, 160, 0.07);
+  border-color: rgba(0, 212, 160, 0.2);
+}
+
+.dark-mode .basic-mode-info strong {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .basic-mode-info p {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── JSON preview box ────────────────────────────────────────────────────── */
+.dark-mode .json-preview-box {
+  background: #0d1117;
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .json-preview-box pre {
+  color: #79c0ff;
+}
+
+.dark-mode .json-preview-box::-webkit-scrollbar-track {
+  background: #1c2128;
+}
+
+.dark-mode .json-preview-box::-webkit-scrollbar-thumb {
+  background: #30363d;
+}
+
+/* ── Search input + Selected fields (Step 3 Advanced) ────────────────────── */
+.dark-mode .search-input-group {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .field-search-input {
+  background: var(--anyapi-card);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .selected-fields-panel {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .selected-field {
+  background: var(--anyapi-card2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .panel-title-row h3 {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .no-fields-hint {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Save status (Step 4) ────────────────────────────────────────────────── */
+.dark-mode .save-status--success {
+  background: rgba(0, 212, 160, 0.1);
+  color: var(--anyapi-success);
+  border-color: rgba(0, 212, 160, 0.25);
+}
+
+.dark-mode .save-status--error {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--anyapi-danger);
+  border-color: rgba(255, 107, 107, 0.25);
+}
+
+/* ── Wizard toolbar ───────────────────────────────────────────────────────── */
+.dark-mode .wizard-title {
+  color: var(--anyapi-text);
+}
+
+/* ── OI Table (integration list) ─────────────────────────────────────────── */
+.dark-mode .oi-table {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .oi-table th {
+  background: var(--anyapi-bg2);
+  color: var(--anyapi-text-muted);
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .oi-table td {
+  border-bottom-color: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .oi-row:hover td {
+  background: rgba(129, 140, 248, 0.05);
+}
+
+.dark-mode .oi-row.is-inactive td {
+  opacity: 0.5;
+}
+
+.dark-mode .oi-table code {
+  background: var(--anyapi-bg2);
+  color: var(--anyapi-text-muted);
+}
+
+/* ── OI key badge ────────────────────────────────────────────────────────── */
+.dark-mode .oi-key-badge {
+  background: rgba(129, 140, 248, 0.1);
+  color: var(--anyapi-primary);
+  border-color: rgba(129, 140, 248, 0.22);
+}
+
+/* ── OI toggle (status in table) ────────────────────────────────────────── */
+.dark-mode .oi-toggle__track {
+  background: var(--anyapi-bg2);
+  border: 1px solid var(--anyapi-border);
+}
+
+.dark-mode .oi-toggle__track::after {
+  background: #e2e4f0;
+}
+
+.dark-mode .oi-toggle__input:checked ~ .oi-toggle__track {
+  background: var(--anyapi-success);
+  border-color: transparent;
+}
+
+/* ── OI empty state ──────────────────────────────────────────────────────── */
+.dark-mode .oi-empty {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .oi-empty h3 {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .oi-empty p {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Upgrade Modal ───────────────────────────────────────────────────────── */
+.dark-mode .upgrade-modal__box {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .upgrade-modal__title {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .upgrade-modal__body {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .upgrade-modal__close {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .upgrade-modal__close:hover {
+  background: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .modal-plan {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .modal-plan--highlight {
+  background: var(--anyapi-card);
+  border-color: rgba(129, 140, 248, 0.45);
+  box-shadow:
+    0 0 0 3px rgba(129, 140, 248, 0.12),
+    var(--anyapi-shadow-lg);
+}
+
+.dark-mode .modal-plan__name {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .modal-plan__price {
+  color: var(--anyapi-primary);
+}
+
+.dark-mode .modal-plan__features li {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .modal-plan__features li.feat--yes {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .upgrade-modal__note {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Usage pill (API key count) ──────────────────────────────────────────── */
+.dark-mode .usage-pill {
+  background: var(--anyapi-bg2);
+  color: var(--anyapi-text-muted);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .usage-pill.is-maxed {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--anyapi-danger);
+  border-color: rgba(255, 107, 107, 0.25);
+}
+
+/* ── limit-warning text ──────────────────────────────────────────────────── */
+.dark-mode .limit-warning {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .limit-warning a {
+  color: var(--anyapi-primary);
+}
+
+/* ── Transition smoothing for theme switch ───────────────────────────────── */
+.dark-mode .steps-sidebar,
+.dark-mode .integration-content,
+.dark-mode .oi-table,
+.dark-mode .upgrade-modal__box,
+.dark-mode .action-tile,
+.dark-mode .filter-mode-btn {
+  transition:
+    background 0.4s,
+    border-color 0.4s,
+    color 0.3s;
+}

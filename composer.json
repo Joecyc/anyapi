@@ -1,0 +1,20 @@
+{
+  "name": "jc/anyapi",
+  "description": "API integration tools for WordPress",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "Anyapi\\": "inc/"
+    }
+  },
+  "authors": [
+    {
+      "name": "JC(http://anyapiplugin.com)"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=8.0"
+  }
+}

@@ -1,0 +1,45 @@
+# OS generated files #
+######################
+**.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+._*
+
+# SASS #
+##########
+**/.sass-cache
+**/.sass-cache/*
+**/map
+
+# Composer #
+##########
+vendor
+!assets/js/vendor/
+composer.lock
+
+# NPM #
+##########
+node_modules
+package.json
+package-lock.json
+yarn.lock
+
+# VSCode Workspace Settings #
+.vscode
+
+# Development #
+gulpfile.js
+
+# Others #
+legacy
+temp
+.prettierignore
+doc/plugin-structure.md
+
+# Security #
+.env
+.env.*
+*.key
+*.pem
+*token*

@@ -1,0 +1,187 @@
+// ══════════════════════════════════════════════════════════════
+// License Settings page (rendered by anyapi-lite)
+// ══════════════════════════════════════════════════════════════
+
+.anyapi-license-wrap {
+  max-width: 620px;
+  margin: 20px 0;
+
+  h1 {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+}
+
+.license-card {
+  background: var(--anyapi-surface, #fff);
+  border: 1px solid var(--anyapi-border, #e0e0e0);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.license-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  margin-bottom: 16px;
+
+  &--active {
+    background: var(--anyapi-surface-success, #d4edda);
+    color: var(--anyapi-text-success, #155724);
+  }
+
+  &--inactive {
+    background: var(--anyapi-surface-danger, #f8d7da);
+    color: var(--anyapi-text-danger, #721c24);
+  }
+
+  &--expired {
+    background: var(--anyapi-surface-warning, #fff3cd);
+    color: var(--anyapi-text-warning, #856404);
+  }
+}
+
+.license-key-display {
+  font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
+  font-size: 0.88em;
+  background: var(--anyapi-surface-muted, #f8f9fa);
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--anyapi-border-light, #e9ecef);
+  margin: 12px 0;
+  word-break: break-all;
+}
+
+.license-form {
+  label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 0.95em;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--anyapi-border, #d0d5dd);
+    border-radius: 6px;
+    font-size: 0.95em;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--anyapi-primary, #7c5cbf);
+      box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.12);
+    }
+  }
+}
+
+.license-actions {
+  .button-primary,
+  .anyapi-btn--primary {
+    background: var(--anyapi-primary, #7c5cbf);
+    border-color: var(--anyapi-primary-dark, #6b4faa);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--anyapi-primary-dark, #6b4faa);
+    }
+  }
+
+  .button-secondary {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--anyapi-border, #d0d5dd);
+    color: var(--anyapi-text-muted, #6c757d);
+    box-shadow: none;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+
+    &:hover {
+      background: transparent;
+      border-color: var(--anyapi-text-muted, #6c757d);
+      color: var(--anyapi-text, #1a1a2e);
+      box-shadow: none;
+    }
+  }
+}
+
+.license-deactivate-hint {
+  color: var(--anyapi-text-muted, #6c757d);
+  font-size: 0.85em;
+  margin-top: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Dark mode
+   -------------------------------------------------------------------------- */
+.dark-mode .anyapi-license-wrap h1 {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .license-card {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .license-key-display {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .license-form {
+  label {
+    color: var(--anyapi-text);
+  }
+
+  input[type="text"] {
+    background: var(--anyapi-bg2);
+    border-color: var(--anyapi-border);
+    color: var(--anyapi-text);
+
+    &::placeholder {
+      color: var(--anyapi-text-muted);
+      opacity: 0.6;
+    }
+
+    &:focus {
+      border-color: var(--anyapi-primary);
+      box-shadow: 0 0 0 3px var(--anyapi-primary-glow);
+    }
+  }
+}
+
+.dark-mode .license-deactivate-hint {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .license-actions .button-secondary {
+  background: transparent;
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+  box-shadow: none;
+
+  &:hover {
+    background: transparent;
+    border-color: var(--anyapi-text-muted);
+    color: var(--anyapi-text);
+    box-shadow: none;
+  }
+}

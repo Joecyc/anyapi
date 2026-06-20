@@ -1,0 +1,1229 @@
+/* ==========================================================================
+   AnyAPI — WC REST API Tester
+   Consistent with dashboard design system
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Page wrapper
+   -------------------------------------------------------------------------- */
+#anyapi-restapi {
+  background: var(--anyapi-bg);
+  min-height: 100vh;
+  padding: 28px 24px;
+}
+
+/* --------------------------------------------------------------------------
+   Page header
+   -------------------------------------------------------------------------- */
+.rt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.rt-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  background: linear-gradient(90deg, var(--anyapi-primary), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.rt-desc {
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+}
+
+.rt-docs-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--anyapi-primary);
+  text-decoration: none;
+  padding: 7px 14px;
+  border: 1.5px solid rgba(93, 95, 239, 0.22);
+  border-radius: var(--anyapi-radius-sm);
+  background: rgba(93, 95, 239, 0.08);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.rt-docs-link:hover {
+  background: rgba(124, 58, 237, 0.14);
+  color: var(--anyapi-primary-hover);
+}
+
+/* --------------------------------------------------------------------------
+   Two-panel layout
+   -------------------------------------------------------------------------- */
+.rt-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .rt-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Panels
+   -------------------------------------------------------------------------- */
+.rt-panel {
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  box-shadow: var(--anyapi-shadow);
+  overflow: hidden;
+}
+
+.rt-panel--response {
+  min-height: 400px;
+}
+
+.rt-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--anyapi-border);
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.04),
+    rgba(236, 72, 153, 0.02)
+  );
+}
+
+.rt-panel__icon {
+  font-size: 18px;
+}
+
+.rt-panel__title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--anyapi-text);
+  margin: 0;
+  flex: 1;
+}
+
+.rt-panel__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rt-panel__body--response {
+  padding: 0;
+  gap: 0;
+  min-height: 360px;
+}
+
+/* --------------------------------------------------------------------------
+   Form elements
+   -------------------------------------------------------------------------- */
+.rt-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rt-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--anyapi-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rt-label--sm {
+  font-size: 12px;
+}
+
+.rt-label-hint {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--anyapi-text-muted);
+  background: var(--anyapi-bg);
+  border: 1px solid var(--anyapi-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.rt-required {
+  color: var(--anyapi-danger);
+}
+
+.rt-input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13px;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  background: var(--anyapi-card);
+  color: var(--anyapi-text);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.rt-input:focus {
+  outline: none;
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.08);
+}
+.rt-input--mono {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+}
+.rt-input--sm {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.rt-select {
+  padding: 9px 12px;
+  font-size: 13px;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  background: var(--anyapi-card);
+  color: var(--anyapi-text);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.rt-select:focus {
+  outline: none;
+  border-color: var(--anyapi-primary);
+}
+
+.rt-hint {
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+}
+.rt-hint--warn {
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.08);
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+.rt-hint--warn a {
+  color: var(--anyapi-primary);
+  font-weight: 600;
+}
+
+.rt-error {
+  font-size: 12px;
+  color: var(--anyapi-danger);
+  min-height: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Quick-pick grid
+   -------------------------------------------------------------------------- */
+.rt-quickpick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rt-quickpick__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--anyapi-bg);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--anyapi-text);
+  white-space: nowrap;
+}
+.rt-quickpick__btn:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  background: rgba(93, 95, 239, 0.08);
+}
+.rt-quickpick__btn.is-selected {
+  border-color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Method badge
+   -------------------------------------------------------------------------- */
+.rt-method-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  letter-spacing: 0.02em;
+}
+.rt-method-badge.is-get {
+  background: rgba(16, 185, 129, 0.12);
+  color: #065f46;
+}
+.rt-method-badge.is-post {
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--anyapi-primary);
+}
+.rt-method-badge.is-put {
+  background: rgba(245, 158, 11, 0.12);
+  color: #92400e;
+}
+.rt-method-badge.is-patch {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1e40af;
+}
+.rt-method-badge.is-delete {
+  background: rgba(239, 68, 68, 0.12);
+  color: #991b1b;
+}
+
+/* --------------------------------------------------------------------------
+   Method select colour variants
+   -------------------------------------------------------------------------- */
+.rt-method-select.is-get {
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #065f46;
+}
+.rt-method-select.is-post {
+  border-color: rgba(93, 95, 239, 0.22);
+  color: var(--anyapi-primary);
+}
+.rt-method-select.is-put {
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #92400e;
+}
+.rt-method-select.is-patch {
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #1e40af;
+}
+.rt-method-select.is-delete {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #991b1b;
+}
+
+/* --------------------------------------------------------------------------
+   URL row (method + input)
+   -------------------------------------------------------------------------- */
+.rt-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.rt-method-select {
+  flex-shrink: 0;
+  min-width: 96px;
+}
+
+.rt-url-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  background: var(--anyapi-card);
+}
+.rt-url-wrap:focus-within {
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.08);
+}
+
+.rt-base-url {
+  flex-shrink: 0;
+  padding: 9px 10px;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--anyapi-text-muted);
+  background: var(--anyapi-bg);
+  border-right: 1px solid var(--anyapi-border);
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rt-url-wrap .rt-input {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  flex: 1;
+  min-width: 0;
+}
+.rt-url-wrap .rt-input:focus {
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Auth fields
+   -------------------------------------------------------------------------- */
+.rt-auth-row {
+  display: flex;
+  gap: 8px;
+}
+.rt-auth-fields {
+  margin-top: 8px;
+}
+.rt-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .rt-two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rt-secret-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.rt-secret-wrap .rt-input {
+  padding-right: 38px;
+}
+.rt-eye-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--anyapi-text-muted);
+  padding: 2px;
+  transition: color 0.15s;
+}
+.rt-eye-btn:hover {
+  color: var(--anyapi-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Collapsible (custom headers)
+   -------------------------------------------------------------------------- */
+.rt-collapsible {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--anyapi-text);
+  background: var(--anyapi-bg);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.rt-collapsible:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  background: rgba(93, 95, 239, 0.08);
+}
+.rt-collapsible__icon {
+  font-size: 10px;
+  color: var(--anyapi-text-muted);
+  transition: transform 0.15s;
+}
+.rt-collapsible__badge {
+  margin-left: auto;
+  background: var(--anyapi-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 20px;
+}
+
+.rt-collapsible__body {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Key-value rows (custom headers)
+   -------------------------------------------------------------------------- */
+.rt-kv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rt-kv-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 28px;
+  gap: 6px;
+  align-items: center;
+}
+
+.rt-kv-remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--anyapi-border);
+  background: var(--anyapi-bg);
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--anyapi-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.rt-kv-remove:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--anyapi-danger);
+}
+
+.rt-add-row-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-primary);
+  background: none;
+  border: 1.5px dashed rgba(93, 95, 239, 0.22);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.rt-add-row-btn:hover {
+  background: rgba(93, 95, 239, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Body editor
+   -------------------------------------------------------------------------- */
+.rt-editor-wrap {
+  position: relative;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.rt-editor-wrap:focus-within {
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.08);
+}
+
+.rt-editor {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 12px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  color: var(--anyapi-text);
+  background: var(--anyapi-card);
+  border: none;
+  resize: vertical;
+  min-height: 160px;
+  box-sizing: border-box;
+  line-height: 1.6;
+  display: block;
+}
+.rt-editor:focus {
+  outline: none;
+}
+
+.rt-editor-actions {
+  display: flex;
+  gap: 1px;
+  border-top: 1px solid var(--anyapi-border);
+  background: var(--anyapi-bg);
+  padding: 6px 10px;
+}
+
+.rt-editor-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.rt-editor-btn:hover {
+  background: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+/* --------------------------------------------------------------------------
+   Send button
+   -------------------------------------------------------------------------- */
+.rt-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--anyapi-primary), #a855f7);
+  border: none;
+  border-radius: var(--anyapi-radius);
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.28);
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+}
+.rt-send-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--anyapi-primary-hover), #9333ea);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(124, 58, 237, 0.36);
+}
+.rt-send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.rt-send-btn.is-loading {
+  animation: rtPulse 1s ease infinite;
+}
+@keyframes rtPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.rt-send-btn__icon {
+  font-size: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   Response meta (status + latency)
+   -------------------------------------------------------------------------- */
+.rt-response-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.rt-status-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: monospace;
+}
+.rt-status-badge.is-2xx {
+  background: rgba(16, 185, 129, 0.12);
+  color: #065f46;
+}
+.rt-status-badge.is-4xx {
+  background: rgba(245, 158, 11, 0.12);
+  color: #92400e;
+}
+.rt-status-badge.is-5xx {
+  background: rgba(239, 68, 68, 0.12);
+  color: #991b1b;
+}
+.rt-status-badge.is-other {
+  background: #f1f5f9;
+  color: var(--anyapi-text-muted);
+}
+.rt-status-badge.is-err {
+  background: rgba(239, 68, 68, 0.12);
+  color: #991b1b;
+}
+
+.rt-latency {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+  font-family: monospace;
+}
+
+.rt-copy-btn {
+  background: none;
+  border: 1px solid var(--anyapi-border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--anyapi-text-muted);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+}
+.rt-copy-btn:hover {
+  background: rgba(93, 95, 239, 0.08);
+  border-color: rgba(93, 95, 239, 0.22);
+}
+
+/* --------------------------------------------------------------------------
+   Response states
+   -------------------------------------------------------------------------- */
+.rt-response-empty,
+.rt-response-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 320px;
+  color: var(--anyapi-text-muted);
+  font-size: 13px;
+  padding: 32px;
+}
+
+.rt-response-empty__icon {
+  font-size: 40px;
+  opacity: 0.5;
+}
+.rt-response-empty__text {
+  margin: 0;
+  text-align: center;
+}
+
+/* Spinner */
+.rt-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--anyapi-border);
+  border-top-color: var(--anyapi-primary);
+  border-radius: 50%;
+  animation: rtSpin 0.7s linear infinite;
+}
+@keyframes rtSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Response tabs
+   -------------------------------------------------------------------------- */
+.rt-response-content {
+  padding: 0;
+}
+
+.rt-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--anyapi-border);
+  padding: 0 16px;
+}
+
+.rt-tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.rt-tab:hover {
+  color: var(--anyapi-primary);
+}
+.rt-tab.active {
+  color: var(--anyapi-primary);
+  border-bottom-color: var(--anyapi-primary);
+}
+
+.rt-tab-panel {
+  padding: 16px;
+}
+
+/* Response toolbar */
+.rt-response-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.rt-view-toggle {
+  display: inline-flex;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rt-view-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.rt-view-btn + .rt-view-btn {
+  border-left: 1px solid var(--anyapi-border);
+}
+.rt-view-btn.active {
+  background: rgba(93, 95, 239, 0.08);
+  color: var(--anyapi-primary);
+}
+
+.rt-response-size {
+  font-size: 11px;
+  color: var(--anyapi-text-muted);
+  font-family: monospace;
+}
+
+/* Response code block */
+.rt-code {
+  background: var(--code-bg, #1e293b);
+  color: var(--code-text, #e2e8f0);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  padding: 16px;
+  border-radius: var(--anyapi-radius-sm);
+  overflow: auto;
+  max-height: 480px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+/* Response headers table */
+.rt-headers-table {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rt-header-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 30%) 1fr;
+  gap: 12px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.rt-header-row:nth-child(odd) {
+  background: var(--anyapi-bg);
+}
+
+.rt-header-key {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--anyapi-primary);
+  word-break: break-all;
+}
+.rt-header-val {
+  font-family: monospace;
+  color: var(--anyapi-text);
+  word-break: break-all;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  #anyapi-restapi {
+    padding: 16px;
+  }
+  .rt-header {
+    flex-direction: column;
+  }
+  .rt-url-row {
+    flex-direction: column;
+  }
+  .rt-method-select {
+    width: 100%;
+  }
+  .rt-base-url {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE — body.dark-mode overrides
+   ========================================================================== */
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.dark-mode #anyapi-restapi {
+  background: var(--anyapi-bg);
+  color: var(--anyapi-text);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.dark-mode .rt-desc {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .rt-docs-link {
+  color: var(--anyapi-primary);
+  border-color: rgba(129, 140, 248, 0.22);
+  background: rgba(129, 140, 248, 0.08);
+}
+.dark-mode .rt-docs-link:hover {
+  color: var(--anyapi-primary-hover);
+  background: rgba(129, 140, 248, 0.14);
+}
+
+/* ── Panel cards ─────────────────────────────────────────────────────────── */
+.dark-mode .rt-panel {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+  box-shadow: var(--anyapi-shadow);
+}
+
+.dark-mode .rt-panel__header {
+  border-bottom-color: var(--anyapi-border);
+  background: linear-gradient(
+    135deg,
+    rgba(129, 140, 248, 0.05),
+    rgba(219, 39, 119, 0.02)
+  );
+}
+
+.dark-mode .rt-panel__title {
+  color: var(--anyapi-text);
+}
+
+/* ── Labels ───────────────────────────────────────────────────────────────── */
+.dark-mode .rt-label,
+.dark-mode .rt-label--sm {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .rt-label-hint {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .rt-required {
+  color: var(--anyapi-danger);
+}
+
+/* ── Inputs & selects ─────────────────────────────────────────────────────── */
+.dark-mode .rt-input,
+.dark-mode .rt-select,
+.dark-mode .rt-editor {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .rt-input:focus,
+.dark-mode .rt-select:focus,
+.dark-mode .rt-editor:focus {
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px var(--anyapi-primary-glow);
+}
+
+.dark-mode .rt-input::placeholder,
+.dark-mode .rt-editor::placeholder {
+  color: var(--anyapi-text-muted);
+  opacity: 0.6;
+}
+
+/* ── Hints / errors ───────────────────────────────────────────────────────── */
+.dark-mode .rt-hint {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .rt-hint--warn {
+  color: var(--anyapi-warn);
+}
+
+.dark-mode .rt-error {
+  color: var(--anyapi-danger);
+}
+
+/* ── URL row ──────────────────────────────────────────────────────────────── */
+.dark-mode .rt-url-wrap {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-url-wrap:focus-within {
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px var(--anyapi-primary-glow);
+}
+
+.dark-mode .rt-base-url {
+  color: var(--anyapi-text-muted);
+  background: var(--anyapi-bg2);
+}
+
+/* ── Method badge (colour-coded — stays vivid in dark) ───────────────────── */
+/* No change needed — badge colours are explicit hex, readable on dark bg */
+
+/* ── Method select colour states ──────────────────────────────────────────── */
+.dark-mode .rt-method-select {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+
+/* ── Quick-pick buttons ───────────────────────────────────────────────────── */
+.dark-mode .rt-quickpick__btn {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .rt-quickpick__btn:hover {
+  border-color: rgba(129, 140, 248, 0.35);
+  background: rgba(129, 140, 248, 0.07);
+  color: var(--anyapi-primary);
+}
+
+.dark-mode .rt-quickpick__btn.is-selected {
+  border-color: var(--anyapi-primary);
+  background: rgba(129, 140, 248, 0.1);
+  color: var(--anyapi-primary);
+}
+
+/* ── Eye (reveal) button ─────────────────────────────────────────────────── */
+.dark-mode .rt-eye-btn {
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .rt-eye-btn:hover {
+  color: var(--anyapi-primary);
+}
+
+/* ── Collapsible sections (headers, params, body) ────────────────────────── */
+.dark-mode .rt-collapsible {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .rt-collapsible:hover {
+  border-color: rgba(129, 140, 248, 0.3);
+  background: rgba(129, 140, 248, 0.06);
+}
+
+.dark-mode .rt-collapsible__badge {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+
+/* ── KV list rows (params / custom headers) ──────────────────────────────── */
+.dark-mode .rt-kv-row {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-kv-remove {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.22);
+  color: var(--anyapi-danger);
+}
+.dark-mode .rt-kv-remove:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* ── Add-row button ──────────────────────────────────────────────────────── */
+.dark-mode .rt-add-row-btn {
+  color: var(--anyapi-primary);
+  border-color: rgba(129, 140, 248, 0.25);
+  background: rgba(129, 140, 248, 0.05);
+}
+.dark-mode .rt-add-row-btn:hover {
+  background: rgba(129, 140, 248, 0.1);
+}
+
+/* ── Editor wrap ─────────────────────────────────────────────────────────── */
+.dark-mode .rt-editor-wrap {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-editor-wrap:focus-within {
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px var(--anyapi-primary-glow);
+}
+
+.dark-mode .rt-editor-actions {
+  border-top-color: var(--anyapi-border);
+  background: var(--anyapi-bg);
+}
+
+.dark-mode .rt-editor-btn {
+  background: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+.dark-mode .rt-editor-btn:hover {
+  background: rgba(129, 140, 248, 0.2);
+  color: var(--anyapi-primary);
+}
+
+/* ── Send button (stays vivid, no override needed) ───────────────────────── */
+
+/* ── Response meta bar ───────────────────────────────────────────────────── */
+.dark-mode .rt-response-meta {
+  /* inherits anyapi-card bg from panel */
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-latency {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Status badges (colour-coded, readable on dark) ──────────────────────── */
+/* Explicit backgrounds already work; only shadow tweak needed */
+.dark-mode .rt-status-badge {
+  box-shadow: none;
+}
+
+/* ── Copy button ─────────────────────────────────────────────────────────── */
+.dark-mode .rt-copy-btn {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .rt-copy-btn:hover {
+  border-color: rgba(129, 140, 248, 0.3);
+  background: rgba(129, 140, 248, 0.08);
+  color: var(--anyapi-primary);
+}
+
+/* ── Response empty / loading ─────────────────────────────────────────────── */
+.dark-mode .rt-response-empty,
+.dark-mode .rt-response-loading {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .rt-response-empty__text {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
+.dark-mode .rt-spinner {
+  border-color: var(--anyapi-border);
+  border-top-color: var(--anyapi-primary);
+}
+
+/* ── Tabs (Pretty / Raw / Headers) ──────────────────────────────────────── */
+.dark-mode .rt-tabs {
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-tab {
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .rt-tab:hover {
+  color: var(--anyapi-text);
+}
+.dark-mode .rt-tab.active {
+  color: var(--anyapi-primary);
+  border-bottom-color: var(--anyapi-primary);
+}
+
+/* ── View toggle (tree / raw) ─────────────────────────────────────────────── */
+.dark-mode .rt-view-toggle {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-view-btn {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .rt-view-btn + .rt-view-btn {
+  border-left-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-view-btn.active {
+  background: rgba(129, 140, 248, 0.1);
+  color: var(--anyapi-primary);
+}
+
+/* ── Response size label ──────────────────────────────────────────────────── */
+.dark-mode .rt-response-size {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Code block ───────────────────────────────────────────────────────────── */
+.dark-mode .rt-code {
+  background: #0d1117;
+  color: #79c0ff;
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-code::-webkit-scrollbar-track {
+  background: #1c2128;
+}
+
+.dark-mode .rt-code::-webkit-scrollbar-thumb {
+  background: #30363d;
+}
+
+/* ── Response headers table ───────────────────────────────────────────────── */
+.dark-mode .rt-headers-table {
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-header-row {
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .rt-header-row:nth-child(odd) {
+  background: rgba(129, 140, 248, 0.04);
+}
+
+.dark-mode .rt-header-key {
+  color: var(--anyapi-primary);
+}
+
+.dark-mode .rt-header-val {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Transition smoothing ─────────────────────────────────────────────────── */
+.dark-mode .rt-panel,
+.dark-mode .rt-input,
+.dark-mode .rt-select,
+.dark-mode .rt-editor,
+.dark-mode .rt-collapsible,
+.dark-mode .rt-kv-row,
+.dark-mode .rt-quickpick__btn {
+  transition:
+    background 0.4s,
+    border-color 0.4s,
+    color 0.3s;
+}

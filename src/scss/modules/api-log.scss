@@ -1,0 +1,1379 @@
+// api-log.scss — API Log page styles
+
+/* --------------------------------------------------------------------------
+   Page wrapper
+   -------------------------------------------------------------------------- */
+#anyapi-logs {
+  background: var(--anyapi-bg);
+  min-height: 100vh;
+  padding: 28px 24px;
+}
+
+/* --------------------------------------------------------------------------
+   Page Header
+   -------------------------------------------------------------------------- */
+.al-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.al-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  background: linear-gradient(90deg, var(--anyapi-primary), #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.al-desc {
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.al-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--anyapi-radius-sm);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.al-btn--ghost {
+  background: transparent;
+  color: var(--anyapi-text-muted);
+  border-color: var(--anyapi-border);
+}
+.al-btn--ghost:hover {
+  color: var(--anyapi-text);
+  border-color: #94a3b8;
+  background: var(--anyapi-bg);
+}
+.al-btn--danger {
+  background: var(--anyapi-danger);
+  color: #fff;
+  border-color: var(--anyapi-danger);
+}
+.al-btn--danger:hover {
+  background: #dc2626;
+}
+.al-btn--sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   ── UPGRADE WALL (Starter plan) ──
+   -------------------------------------------------------------------------- */
+.al-upgrade-wall {
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  box-shadow: var(--anyapi-shadow);
+  overflow: hidden;
+}
+
+.al-upgrade-wall__inner {
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.al-upgrade-wall__icon {
+  font-size: 52px;
+  opacity: 0.7;
+}
+
+.al-upgrade-wall__title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--anyapi-text);
+  margin: 0;
+}
+
+.al-upgrade-wall__desc {
+  font-size: 14px;
+  color: var(--anyapi-text-muted);
+  max-width: 480px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.al-upgrade-wall__features {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.al-upgrade-wall__features li {
+  font-size: 14px;
+  color: var(--anyapi-text);
+  font-weight: 500;
+}
+
+/* Blurred preview table */
+.al-preview-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  margin-top: 8px;
+  border-radius: var(--anyapi-radius);
+  overflow: hidden;
+  border: 1px solid var(--anyapi-border);
+}
+
+.al-preview-blur {
+  filter: blur(3px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.al-preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(248, 250, 252, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.al-upgrade-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--anyapi-primary), #a855f7);
+  border-radius: var(--anyapi-radius);
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);
+  transition: all 0.2s;
+}
+.al-upgrade-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.45);
+  color: #fff;
+}
+
+.al-upgrade-note {
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   ── FULL LOG UI (Lite+ plan) ──
+   -------------------------------------------------------------------------- */
+
+/* Stats row */
+.al-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .al-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 540px) {
+  .al-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.al-stat-card {
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--anyapi-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.al-stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--anyapi-primary);
+  opacity: 0.3;
+}
+.al-stat-card--success::before {
+  background: var(--anyapi-success);
+}
+.al-stat-card--warn::before {
+  background: var(--anyapi-warn);
+}
+.al-stat-card--danger::before {
+  background: var(--anyapi-danger);
+}
+
+.al-stat-card__value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--anyapi-text);
+  line-height: 1;
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.al-stat-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Toolbar */
+.al-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.al-search-wrap {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.al-search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  pointer-events: none;
+  color: var(--anyapi-text-muted);
+}
+
+.al-search {
+  width: 100%;
+  padding: 9px 36px 9px 36px;
+  font-size: 13px;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  background: var(--anyapi-card);
+  color: var(--anyapi-text);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.al-search:focus {
+  outline: none;
+  border-color: var(--anyapi-primary);
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.08);
+}
+
+.al-search-clear {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--anyapi-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  transition: color 0.15s;
+}
+.al-search-clear:hover {
+  color: var(--anyapi-danger);
+}
+
+.al-filters {
+  display: flex;
+  gap: 4px;
+}
+
+.al-filter-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--anyapi-text-muted);
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: monospace;
+}
+.al-filter-btn:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+}
+.al-filter-btn.active {
+  background: var(--anyapi-primary);
+  color: #fff;
+  border-color: var(--anyapi-primary);
+}
+
+/* Clear confirm bar */
+.al-clear-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--anyapi-radius-sm);
+  flex-wrap: wrap;
+  animation: alFadeIn 0.15s ease;
+}
+
+@keyframes alFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.al-clear-confirm__msg {
+  font-size: 13px;
+  color: #7f1d1d;
+  font-weight: 500;
+}
+.al-clear-confirm__actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Table card
+   -------------------------------------------------------------------------- */
+.al-table-card {
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  box-shadow: var(--anyapi-shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Loading overlay */
+.al-loading {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  z-index: 10;
+  border-radius: var(--anyapi-radius);
+}
+
+.al-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--anyapi-border);
+  border-top-color: var(--anyapi-primary);
+  border-radius: 50%;
+  animation: alSpin 0.7s linear infinite;
+}
+@keyframes alSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty state */
+.al-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.al-empty__icon {
+  font-size: 40px;
+  opacity: 0.5;
+}
+.al-empty__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--anyapi-text);
+  margin: 0;
+}
+.al-empty__desc {
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  margin: 0;
+  max-width: 320px;
+}
+
+/* Table wrap */
+.al-table-wrap {
+  overflow-x: auto;
+  transition: opacity 0.2s;
+}
+
+/* --------------------------------------------------------------------------
+   Table
+   -------------------------------------------------------------------------- */
+.al-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.al-table th {
+  padding: 11px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--anyapi-text-muted);
+  background: var(--anyapi-bg);
+  border-bottom: 1px solid var(--anyapi-border);
+  white-space: nowrap;
+  text-align: left;
+}
+
+.al-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--anyapi-border);
+  color: var(--anyapi-text);
+  vertical-align: middle;
+}
+
+.al-row:last-child td {
+  border-bottom: none;
+}
+.al-row:hover td {
+  background: rgba(124, 58, 237, 0.02);
+}
+
+/* Column widths */
+.al-th--order {
+  width: 80px;
+}
+.al-th--status {
+  width: 70px;
+}
+.al-th--trigger {
+  width: 120px;
+}
+.al-th--url {
+  /* flex */
+}
+.al-th--latency {
+  width: 80px;
+  text-align: right;
+}
+.al-th--time {
+  width: 100px;
+}
+.al-th--expand {
+  width: 40px;
+}
+
+.al-td--latency {
+  text-align: right;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+}
+.al-td--latency.is-slow {
+  color: var(--anyapi-danger);
+}
+.al-td--time {
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+}
+.al-td--url {
+  max-width: 260px;
+}
+
+.al-url-text {
+  display: block;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+  color: var(--anyapi-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.al-order-link {
+  font-weight: 700;
+  color: var(--anyapi-primary);
+  text-decoration: none;
+}
+.al-order-link:hover {
+  text-decoration: underline;
+}
+
+/* Status badge */
+.al-status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-family: monospace;
+}
+.al-status-badge.is-2xx {
+  background: rgba(16, 185, 129, 0.1);
+  color: #065f46;
+}
+.al-status-badge.is-4xx {
+  background: rgba(245, 158, 11, 0.1);
+  color: #92400e;
+}
+.al-status-badge.is-5xx {
+  background: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
+}
+.al-status-badge.is-other {
+  background: #f1f5f9;
+  color: var(--anyapi-text-muted);
+}
+
+/* Trigger tag */
+.al-trigger-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: rgba(93, 95, 239, 0.08);
+  color: var(--anyapi-primary);
+  border: 1px solid rgba(93, 95, 239, 0.22);
+  border-radius: 20px;
+}
+
+/* Expand button */
+.al-expand-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--anyapi-bg);
+  border: 1px solid var(--anyapi-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--anyapi-text-muted);
+}
+.al-expand-btn:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  background: rgba(93, 95, 239, 0.08);
+  color: var(--anyapi-primary);
+}
+.al-expand-btn[aria-expanded="true"] {
+  background: rgba(93, 95, 239, 0.08);
+  border-color: rgba(93, 95, 239, 0.22);
+  color: var(--anyapi-primary);
+}
+
+.al-expand-icon {
+  font-size: 9px;
+  transition: transform 0.15s;
+}
+.al-expand-btn[aria-expanded="true"] .al-expand-icon {
+  transform: rotate(90deg);
+}
+
+/* --------------------------------------------------------------------------
+   Payload expand row
+   -------------------------------------------------------------------------- */
+.al-payload-row {
+  background: var(--anyapi-bg);
+}
+
+.al-payload-cell {
+  padding: 0 !important;
+}
+
+.al-payload-inner {
+  padding: 16px;
+  border-top: 1px solid rgba(93, 95, 239, 0.22);
+  border-left: 3px solid var(--anyapi-primary);
+}
+
+.al-payload-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.al-payload-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--anyapi-text-muted);
+}
+
+.al-copy-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  border: 1px solid rgba(93, 95, 239, 0.22);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.al-copy-btn:hover {
+  background: rgba(124, 58, 237, 0.14);
+}
+
+.al-payload-code {
+  background: #1e293b;
+  color: #e2e8f0;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border-radius: var(--anyapi-radius-sm);
+  overflow: auto;
+  max-height: 300px;
+  white-space: pre;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Pagination
+   -------------------------------------------------------------------------- */
+.al-pagination {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: none;
+  gap: 10px;
+}
+
+.al-pagination__controls {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.al-page-numbers {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.al-pagination__info {
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  white-space: nowrap;
+}
+
+.al-page-num,
+.al-page-dots {
+  display: inline-flex !important;
+}
+
+.al-page-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--anyapi-card);
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  color: var(--anyapi-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.al-page-btn:hover:not(:disabled) {
+  border-color: rgba(93, 95, 239, 0.22);
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+}
+.al-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.al-page-num {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: none;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  color: var(--anyapi-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.al-page-num:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+}
+.al-page-num.is-current {
+  background: var(--anyapi-primary);
+  color: #fff;
+  border-color: var(--anyapi-primary);
+}
+
+.al-page-dots {
+  width: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+  line-height: 32px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  #anyapi-logs {
+    padding: 16px;
+  }
+  .al-header {
+    flex-direction: column;
+  }
+  .al-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .al-filters {
+    flex-wrap: wrap;
+  }
+  .al-upgrade-wall__inner {
+    padding: 32px 20px;
+  }
+  .al-th--trigger,
+  .al-td--trigger,
+  .al-th--latency,
+  .al-td--latency {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Starter tiered UI elements
+   ========================================================================== */
+
+/* ── Stats locked: blur overlay container ────────────────────────────────── */
+.al-stats--locked {
+  position: relative;
+  overflow: hidden;
+}
+
+.al-stats--locked .al-stat-card {
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.al-stats-blur-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 2;
+}
+
+.al-upgrade-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--anyapi-primary), #a855f7);
+  border-radius: var(--anyapi-radius-sm);
+  text-decoration: none;
+  box-shadow: 0 4px 14px var(--anyapi-primary-glow);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.al-upgrade-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--anyapi-primary-glow);
+  color: #fff;
+}
+
+/* ── Search locked state ─────────────────────────────────────────────────── */
+.al-search-wrap--locked {
+  position: relative;
+  opacity: 0.8;
+}
+
+.al-search-wrap--locked .al-search {
+  cursor: not-allowed;
+  background: var(--anyapi-bg2);
+  color: var(--anyapi-text-muted);
+  padding-right: 80px; /* room for lock badge */
+}
+
+.al-search-lock-badge {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  border: 1px solid rgba(93, 95, 239, 0.22);
+  border-radius: 20px;
+  padding: 2px 10px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.al-search-lock-badge:hover {
+  background: rgba(93, 95, 239, 0.15);
+  color: var(--anyapi-primary-hover);
+}
+
+/* ── Filters locked state ────────────────────────────────────────────────── */
+.al-filters--locked .al-filter-btn {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Starter table card ──────────────────────────────────────────────────── */
+.al-table-card--starter {
+  position: relative;
+}
+
+/* ── Starter log header (title + note) ──────────────────────────────────── */
+.al-starter-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--anyapi-border);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.al-starter-log-title {
+  font-size: 10.5px;
+  font-family: var(--anyapi-font-mono, "SFMono-Regular", Consolas, monospace);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--anyapi-text-muted);
+}
+
+.al-starter-log-note {
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+}
+.al-starter-log-note a {
+  color: var(--anyapi-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+.al-starter-log-note a:hover {
+  text-decoration: underline;
+}
+
+/* ── Method badge ────────────────────────────────────────────────────────── */
+.al-method-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--anyapi-font-mono, monospace);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.al-method-badge--get {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.al-method-badge--post {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+.al-method-badge--put {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+.al-method-badge--patch {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+}
+.al-method-badge--delete {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+/* ── Endpoint cell ───────────────────────────────────────────────────────── */
+.al-ep {
+  font-family: var(--anyapi-font-mono, "SFMono-Regular", Consolas, monospace);
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Upgrade nudge bar ───────────────────────────────────────────────────── */
+.al-starter-upgrade-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-top: 1px solid var(--anyapi-border);
+  background: rgba(93, 95, 239, 0.04);
+}
+
+.al-starter-upgrade-bar__text {
+  font-size: 13px;
+  color: var(--anyapi-text-muted);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   DARK MODE — body.dark-mode overrides
+   ========================================================================== */
+
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+.dark-mode #anyapi-logs {
+  background: var(--anyapi-bg);
+  color: var(--anyapi-text);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.dark-mode .al-title {
+  /* gradient title stays vivid — no override needed */
+}
+
+.dark-mode .al-desc {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.dark-mode .al-btn--ghost {
+  background: transparent;
+  color: var(--anyapi-text-muted);
+  border-color: var(--anyapi-border);
+}
+.dark-mode .al-btn--ghost:hover {
+  color: var(--anyapi-text);
+  border-color: var(--anyapi-text-muted);
+  background: var(--anyapi-bg2);
+}
+
+/* ── Stat cards ──────────────────────────────────────────────────────────── */
+.dark-mode .al-stat-card {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .al-stat-card__value {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .al-stat-card__label {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-stat-card--success .al-stat-card__value {
+  color: var(--anyapi-success);
+}
+
+.dark-mode .al-stat-card--warn .al-stat-card__value {
+  color: var(--anyapi-warn);
+}
+
+.dark-mode .al-stat-card--danger .al-stat-card__value {
+  color: var(--anyapi-danger);
+}
+
+/* ── Stats locked (Starter) ──────────────────────────────────────────────── */
+.dark-mode .al-stats-blur-overlay {
+  background: rgba(15, 17, 30, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+/* ── Toolbar: search + filters ───────────────────────────────────────────── */
+.dark-mode .al-toolbar {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .al-search-wrap {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .al-search {
+  background: transparent;
+  color: var(--anyapi-text);
+}
+
+.dark-mode .al-search::placeholder {
+  color: var(--anyapi-text-muted);
+  opacity: 0.6;
+}
+
+.dark-mode .al-search-icon {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-search-clear {
+  color: var(--anyapi-text-muted);
+}
+
+/* Locked search (Starter) */
+.dark-mode .al-search-wrap--locked .al-search {
+  background: var(--anyapi-bg2);
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-search-lock-badge {
+  background: rgba(129, 140, 248, 0.1);
+  border-color: rgba(129, 140, 248, 0.22);
+  color: var(--anyapi-primary);
+}
+
+/* Filter buttons */
+.dark-mode .al-filter-btn {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-filter-btn:hover:not(:disabled) {
+  border-color: rgba(129, 140, 248, 0.35);
+  background: rgba(129, 140, 248, 0.07);
+  color: var(--anyapi-primary);
+}
+
+.dark-mode .al-filter-btn.active {
+  background: rgba(129, 140, 248, 0.12);
+  border-color: var(--anyapi-primary);
+  color: var(--anyapi-primary);
+}
+
+/* ── Clear confirm bar ───────────────────────────────────────────────────── */
+.dark-mode .al-clear-confirm {
+  background: rgba(255, 107, 107, 0.08);
+  border-color: rgba(255, 107, 107, 0.22);
+}
+
+.dark-mode .al-clear-confirm__msg {
+  color: var(--anyapi-danger);
+}
+
+/* ── Table card ──────────────────────────────────────────────────────────── */
+.dark-mode .al-table-card {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+  box-shadow: var(--anyapi-shadow);
+}
+
+/* ── Starter log header ──────────────────────────────────────────────────── */
+.dark-mode .al-starter-log-header {
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .al-starter-log-title {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-starter-log-note {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-starter-log-note a {
+  color: var(--anyapi-primary);
+}
+
+/* ── Table ────────────────────────────────────────────────────────────────── */
+.dark-mode .al-table thead tr {
+  background: var(--anyapi-bg2);
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .al-table th {
+  color: var(--anyapi-text-muted);
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .al-table td {
+  color: var(--anyapi-text);
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .al-table tbody tr:hover td {
+  background: rgba(129, 140, 248, 0.05);
+}
+
+/* ── Endpoint cell ────────────────────────────────────────────────────────── */
+.dark-mode .al-ep {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Method badges (dark-adjusted) ──────────────────────────────────────── */
+.dark-mode .al-method-badge--get {
+  background: rgba(0, 212, 160, 0.12);
+  color: var(--anyapi-success);
+}
+.dark-mode .al-method-badge--post {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+}
+.dark-mode .al-method-badge--put {
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--anyapi-warn);
+}
+.dark-mode .al-method-badge--patch {
+  background: rgba(167, 139, 250, 0.12);
+  color: var(--anyapi-primary);
+}
+.dark-mode .al-method-badge--delete {
+  background: rgba(255, 107, 107, 0.12);
+  color: var(--anyapi-danger);
+}
+
+/* ── Status badges — vivid, minor shadow tweak only ─────────────────────── */
+.dark-mode .al-status-badge {
+  box-shadow: none;
+}
+
+/* ── Expand / payload row ────────────────────────────────────────────────── */
+.dark-mode .al-expand-row td {
+  background: var(--anyapi-bg2);
+  border-bottom-color: var(--anyapi-border);
+}
+
+.dark-mode .al-payload-pre {
+  background: #0d1117;
+  color: #79c0ff;
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .al-copy-btn {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .al-copy-btn:hover {
+  border-color: rgba(129, 140, 248, 0.3);
+  background: rgba(129, 140, 248, 0.08);
+  color: var(--anyapi-primary);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+.dark-mode .al-empty__title {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .al-empty__desc {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Loading spinner ─────────────────────────────────────────────────────── */
+.dark-mode .al-spinner {
+  border-color: var(--anyapi-border);
+  border-top-color: var(--anyapi-primary);
+}
+
+.dark-mode .al-loading span {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+.dark-mode .al-pagination {
+  border-top-color: var(--anyapi-border);
+  background: var(--anyapi-bg2);
+}
+
+.dark-mode .al-pagination__info {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-page-btn {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .al-page-btn:hover:not(:disabled) {
+  border-color: rgba(129, 140, 248, 0.35);
+  background: rgba(129, 140, 248, 0.07);
+  color: var(--anyapi-primary);
+}
+.dark-mode .al-page-btn:disabled {
+  opacity: 0.35;
+}
+
+.dark-mode .al-page-number {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .al-page-number.active {
+  background: var(--anyapi-primary);
+  border-color: var(--anyapi-primary);
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Log footer — Clear All + confirm bar
+   -------------------------------------------------------------------------- */
+.al-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.al-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.al-clear-bar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--anyapi-surface-warning, #fff3cd);
+  border: 1px solid var(--anyapi-border-warning, #ffc107);
+  border-radius: 6px;
+
+  &[style*="flex"] {
+    display: flex !important;
+  }
+}
+
+.al-clear-bar__text {
+  font-size: 0.9em;
+  color: var(--anyapi-text-secondary, #856404);
+}
+
+/* ── Upgrade wall (legacy Starter path — kept for fallback) ──────────────── */
+.dark-mode .al-upgrade-wall {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+}
+
+.dark-mode .al-upgrade-wall__title {
+  color: var(--anyapi-text);
+}
+
+.dark-mode .al-upgrade-wall__desc {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-upgrade-wall__features li {
+  color: var(--anyapi-text-muted);
+}
+
+.dark-mode .al-preview-wrap {
+  background: var(--anyapi-bg2);
+  border-color: var(--anyapi-border);
+}
+
+/* ── Starter upgrade nudge bar ──────────────────────────────────────────── */
+.dark-mode .al-starter-upgrade-bar {
+  background: rgba(129, 140, 248, 0.05);
+  border-top-color: var(--anyapi-border);
+}
+
+.dark-mode .al-starter-upgrade-bar__text {
+  color: var(--anyapi-text-muted);
+}
+
+/* ── Transition smoothing ─────────────────────────────────────────────────── */
+.dark-mode .al-table-card,
+.dark-mode .al-stat-card,
+.dark-mode .al-toolbar,
+.dark-mode .al-table th,
+.dark-mode .al-table td,
+.dark-mode .al-filter-btn,
+.dark-mode .al-page-btn {
+  transition:
+    background 0.4s,
+    border-color 0.4s,
+    color 0.3s;
+}
