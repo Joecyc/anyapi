@@ -84,9 +84,9 @@ The free version is fully functional — not a crippled demo:
 
 ## Screenshots
 
-![desc](assets/anyapi-dashboard.png)
-![desc](assets/order-api.png)
-![desc](assets/json-filter.png)
+![desc](assets/images/anyapi-dashboard.png)
+![desc](assets/images/order-api.png)
+![desc](assets/images/json-filter.png)
 
 ## Changelog
 
