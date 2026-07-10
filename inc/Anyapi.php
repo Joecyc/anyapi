@@ -139,7 +139,7 @@ class Anyapi {
           esc_html__( 'Upgrade', 'anyapi' )
         ),
         'capability'  => 'manage_options',
-        'menu_slug'   => 'https://anyapiplugin.com/pricing',
+        'menu_slug'   => anyapi_utm_url( 'https://anyapiplugin.com/pricing', 'plugin', 'upgrade' ),
         'callback'    => array(),
       );
     }

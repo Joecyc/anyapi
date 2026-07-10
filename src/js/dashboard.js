@@ -20,7 +20,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Current plan — injected by enqueueFiles()
   const IS_STARTER = cfg.plan === "starter";
-  const UPGRADE_URL = cfg.upgrade_url || "https://anyapiplugin.com/pricing";
+  // UTM-tag the hardcoded fallback; same medium as the PlanHelper source.
+  const UPGRADE_URL =
+    cfg.upgrade_url ||
+    "https://anyapiplugin.com/pricing?utm_source=starter&utm_medium=plugin&utm_campaign=upgrade";
 
   // == DOM refs ==============================================================
   const tableBody = document.getElementById("anyapi-logs-body");

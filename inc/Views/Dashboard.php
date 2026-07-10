@@ -47,8 +47,10 @@ class Dashboard {
 
     if ( ! Admin::shouldShowBanner() ) return;
 
-    $log_count   = Admin::getLogCount();
-    $active_days = Admin::activatedDay();
+    // Banner stats now reflect recent success and first-success day, not cumulative log count
+    $success_7d  = (int) Admin::getLog( 'recent_success' );
+    $fsd         = Admin::getLog( 'first_success_days' );
+    $active_days = ( $fsd === null ) ? 0 : (int) $fsd;
     ?>
     <div id="anyapi-review-banner" class="anyapi-review-banner">
 
@@ -84,9 +86,9 @@ class Dashboard {
           <div class="banner-stat">
             <span class="banner-stat-dot"></span>
             <span><?php printf(
-              /* translators: %s: automations count */
-              esc_html__( '%s automations fired this month', 'anyapi' ),
-              '<strong style="color:#4ade80">' . esc_html( number_format( $log_count ) ) . '</strong>'
+              /* translators: %s: successful automations count in the last 7 days */
+              esc_html__( '%s successful automations in the last 7 days', 'anyapi' ),
+              '<strong style="color:#4ade80">' . esc_html( number_format( $success_7d ) ) . '</strong>'
             ); ?></span>
           </div>
           <div class="banner-stars" aria-label="<?php esc_attr_e( '5 stars', 'anyapi' ); ?>">⭐⭐⭐⭐⭐</div>
@@ -210,6 +212,7 @@ class Dashboard {
       : ( $todayCalls > 0 ? 100 : 0 );
     $todaySuccess    = Admin::getLog( 'rate' );
     $successRate     = $todayCalls > 0 ? round( ( $todaySuccess / $todayCalls ) * 100, 2 ) : 0;
+    $noCallsToday    = ( (int) $todayCalls === 0 ); // Neutral state when there are no calls today
     $avgLatency      = (int) round( Admin::getLog( 'latency' ) ?: 0 );
     $activeEndpoints = Admin::getLog( 'endpoints' ) ?: 0;
     ?>
@@ -227,13 +230,16 @@ class Dashboard {
 
       <div class="anyapi-card stat-card">
         <div class="stat-card-label"><?php esc_html_e( 'Success Rate Today', 'anyapi' ); ?></div>
-        <div class="stat-card-value <?php echo $successRate >= 90 ? 'success' : ( $successRate >= 70 ? 'warn' : 'danger' ); ?>">
-          <?php echo esc_html( $successRate ); ?>%
+        <?php // Neutral state when there are no calls today ?>
+        <div class="stat-card-value <?php echo $noCallsToday ? 'muted' : ( $successRate >= 90 ? 'success' : ( $successRate >= 70 ? 'warn' : 'danger' ) ); ?>">
+          <?php echo $noCallsToday ? '—' : esc_html( $successRate ) . '%'; ?>
         </div>
-        <div class="stat-chip <?php echo $successRate >= 90 ? 'chip-up' : 'chip-warn'; ?>">
-          <?php echo $successRate >= 90
-            ? '✓ ' . esc_html__( 'Healthy', 'anyapi' )
-            : '⚠ ' . esc_html__( 'Check errors', 'anyapi' ); ?>
+        <div class="stat-chip <?php echo $noCallsToday ? 'chip-mute' : ( $successRate >= 90 ? 'chip-up' : 'chip-warn' ); ?>">
+          <?php echo $noCallsToday
+            ? esc_html__( 'No calls yet today', 'anyapi' )
+            : ( $successRate >= 90
+              ? '✓ ' . esc_html__( 'Healthy', 'anyapi' )
+              : '⚠ ' . esc_html__( 'Check errors', 'anyapi' ) ); ?>
         </div>
       </div>
 

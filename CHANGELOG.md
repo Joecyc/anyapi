@@ -6,17 +6,76 @@ All notable changes to this plugin will be documented in this file.
 
 ## [Unreleased]
 
+### Architecture
+
+### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+---
+
+## [2.0.3] (2026-07-10)
+
+### Architecture
+
+### Added
+
+- (T-1) UTM tracking on Starter outbound links to anyapiplugin.com — central `anyapi_utm_url()` helper tags PlanHelper's shared upgrade URL (inherited site-wide by the Order API upgrade badge and Upgrade submenu link), the Settings page docs link, and the dashboard.js hardcoded fallback; readme.txt homepage/docs/pricing links tagged; new `settings` UTM medium added. WordPress.org listing links, `admin_url()` links, and remote server calls are excluded by design; plugin-list screen and changelog links deferred to a follow-up.
+
+### Changed
+
+- (U-7) Review banner stat now shows successful automations in the last 7 days instead of cumulative log count.
+- (U-7) `shouldShowBanner()` reads the precomputed `should_show` condition from `anyapi_review_conditions` instead of recomputing on every check.
+- (U-7) Review banner layout: added top spacing, aligned left/right edges with the header.
+
+### Removed
+
+### Fixed
+
+- (U-7) Review banner now gates on recent success (last 7 days) and a healthy last-24h window, instead of cumulative log count; days-used counts from the first successful call, not plugin activation.
+- (U-7) Review banner close button no longer overlaps banner action buttons.
+- (U-9) Success Rate Today card shows a neutral state when there are no calls yet today, instead of a false "danger"/red "Check errors" state.
+
+---
+
+## [2.0.2] (2026-06-26)
+
 ### Added
 
 - (F-7/P1) `inc/AnyapiDebug.php` — static debug logger class, guarded by `anyapi_debug_mode` option
 - (F-7/P1) Settings page: Debug Mode toggle with save/load via `update_option()`
 - (F-7/P2) L1–L4 debug log points in `OrderIntegrations::onStatusChange()` (Starter+)
 - (F-7/P3) L5–L8 debug log points in `OrderIntegrations::fireIntegration()` (Lite+)
+- (F-8) Order API: static payload override — empty payload field sends full WooCommerce order data; a populated payload field sends it as a static JSON string (no variable substitution).
+
+### Changed
+
+- Stripped internal task ID tags ([NEW], [F-7]) from inline comments per Comment Rules.
+- Removed wp_options option name references from comments (Rule 1 compliance).
+
+### Fixed
+
+- Order API: page scrolls to top after save; JSON preview refreshes on mode switch.
+- Order API: API Logs breadcrumb link corrected to use the right page slug.
 
 ### Architecture
 
 - Debug log scope: Starter L1–L4 (trigger/gate/usage); Lite+ adds L5–L10 (payload/filter/HTTP)
 - `AnyapiDebug::log( $context, $message, $data )` — token/password excluded; payload/response body truncated 300–500 chars
+- F-8 Starter payload override (Design A): empty payload field triggers full WooCommerce order data send; populated payload is sent as static JSON without {{variable}} interpolation. Affects `OrderIntegrations::fireIntegration()` Basic mode path.
+
+---
+
+## [2.0.1] (2026-06-08)
+
+### Added
+
+- Debug Mode toggle in Settings — enable detailed logging for troubleshooting API integrations.
+- Debug log points covering the full integration lifecycle: status change detection, trigger matching, authentication, payload building, JSON filtering, and HTTP response.
 
 ---
 

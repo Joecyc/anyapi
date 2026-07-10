@@ -384,7 +384,7 @@ $features = array(
           </div>
 
           <div class="st-info-links">
-            <a href="https://anyapiplugin.com/documentation" target="_blank" rel="noopener">📖 Docs</a>
+            <a href="<?php echo esc_url( anyapi_utm_url( 'https://anyapiplugin.com/documentation', 'settings', 'docs' ) ); ?>" target="_blank" rel="noopener">📖 Docs</a>
             <a href="https://wordpress.org/support/plugin/anyapi/" target="_blank" rel="noopener">💬 Support</a>
             <a href="https://wordpress.org/support/plugin/anyapi/reviews/#new-post" target="_blank" rel="noopener">⭐ Review</a>
           </div>

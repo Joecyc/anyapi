@@ -148,17 +148,25 @@ class Admin {
     if ( ! $activatedTime ) {
       $activatedTime = time();
       update_option( 'anyapi_activated_time', $activatedTime );
-      $daysUsed = 0;
-    } else {
-      $daysUsed = floor( ( time() - $activatedTime ) / DAY_IN_SECONDS );
     }
+
+    // Days used now counts from first successful call, not activation
+    $firstSuccessDays = self::getLog( 'first_success_days' );
+    $daysUsed = ( $firstSuccessDays === null ) ? 0 : (int) $firstSuccessDays;
 
     $dismissed   = get_option( 'anyapi_review_dismissed' );
     $dismissTime = get_option( 'anyapi_review_dismiss_time' );
     $reviewed    = get_option( 'anyapi_review_given' );
 
+    // Gate on recent success and a healthy last-24h window, not cumulative log count
+    $recentSuccess  = (int) self::getLog( 'recent_success' );
+    $last24hTotal   = (int) self::getLog( 'last24h_total' );
+    $last24hSuccess = (int) self::getLog( 'last24h_success' );
+    $last24hOk      = ( $last24hTotal === 0 || $last24hSuccess > 0 );
+
     $shouldShowBanner = (
-      $logCount >= 10 && $daysUsed >= 7 &&
+      $recentSuccess >= 3 && $daysUsed >= 7 &&
+      $last24hOk &&
       ! $dismissed && ! $reviewed &&
       ( ! $dismissTime || time() > $dismissTime )
     );
@@ -166,9 +174,10 @@ class Admin {
     update_option( 'anyapi_version',   ANYAPI_VERSION );
     update_option( 'anyapi_log_count', $logCount );
     update_option( 'anyapi_review_conditions', array(
-      'log_count'   => $logCount,
-      'days_used'   => $daysUsed,
-      'should_show' => $shouldShowBanner,
+      'log_count'      => $logCount,
+      'recent_success' => $recentSuccess,
+      'days_used'      => $daysUsed,
+      'should_show'    => $shouldShowBanner,
     ) );
 
     if ( $shouldShowBanner ) {
@@ -186,10 +195,10 @@ class Admin {
     return get_option( 'anyapi_log_count' );
   }
 
+  // Read the precomputed condition instead of recomputing, single source of truth
   public static function shouldShowBanner(): bool {
-    return self::getLogCount() >= 10
-        && self::activatedDay() >= 7
-        && ! get_option( 'anyapi_review_dismissed' );
+    $cond = get_option( 'anyapi_review_conditions' );
+    return is_array( $cond ) && ! empty( $cond['should_show'] );
   }
 
   // ── Enqueue ────────────────────────────────────────────────────────────────
@@ -295,6 +304,11 @@ class Admin {
       'latency'   => $wpdb->get_var( $wpdb->prepare( 'SELECT AVG(latency) FROM %i WHERE DATE(timestamp) = CURDATE() AND latency IS NOT NULL', $table ) ),
       'endpoints' => $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(DISTINCT api_url) FROM %i', $table ) ),
       'ytdcall'   => $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE DATE(timestamp) = CURDATE() - INTERVAL 1 DAY', $table ) ),
+      // Success-based keys to gate review banner on recent healthy usage
+      'recent_success'     => $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND http_code >= %d AND http_code < %d', $table, 200, 300 ) ),
+      'first_success_days' => $wpdb->get_var( $wpdb->prepare( 'SELECT DATEDIFF(NOW(), MIN(timestamp)) FROM %i WHERE http_code >= %d AND http_code < %d', $table, 200, 300 ) ),
+      'last24h_total'      => $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)', $table ) ),
+      'last24h_success'    => $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR) AND http_code >= %d AND http_code < %d', $table, 200, 300 ) ),
       // phpcs:enable
       default     => 0,
     };

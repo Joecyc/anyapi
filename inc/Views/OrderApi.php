@@ -167,7 +167,8 @@ class OrderApi {
     echo '</div>';
 
     echo '<div class="feature-tags order-properties">';
-    echo '<a href="https://anyapiplugin.com/pricing"><span class="upgrade tag tag--woo available">Unlock All fields</span></a>';
+    // UTM-tag the upgrade badge link; same medium as the PlanHelper source.
+    echo '<a href="' . esc_url( anyapi_utm_url( 'https://anyapiplugin.com/pricing', 'plugin', 'upgrade' ) ) . '"><span class="upgrade tag tag--woo available">Unlock All fields</span></a>';
     echo '<div class="image-container"><img src="' . esc_url( $image2 ) . '" alt="" width="16" height="16"></div>';
     echo '</div>';
 

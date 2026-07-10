@@ -5,7 +5,7 @@ Tags: woocommerce, webhooks, api, automation, rest api
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.1
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,11 +13,11 @@ Send WooCommerce orders to any REST API automatically — no code required. Buil
 
 == Description ==
 
-**[AnyAPI](https://www.anyapiplugin.com)** is the easiest no-code way to send WooCommerce orders to any REST API or webhook endpoint — with built-in JSON Filter and real-time API Logs.
+**[AnyAPI](https://www.anyapiplugin.com?utm_source=starter&utm_medium=readme&utm_campaign=home)** is the easiest no-code way to send WooCommerce orders to any REST API or webhook endpoint — with built-in JSON Filter and real-time API Logs.
 
 When an order happens in WooCommerce, AnyAPI sends it anywhere: your ERP, CRM, fulfillment system, accounting software, messaging service, or any custom REST API. No coding required, no expensive monthly SaaS fees.
 
-🔗 [Official Website](https://anyapiplugin.com) | 📖 [Documentation](https://anyapiplugin.com/documentation/) | 💬 [Support](https://wordpress.org/support/plugin/anyapi/)
+🔗 [Official Website](https://anyapiplugin.com?utm_source=starter&utm_medium=readme&utm_campaign=home) | 📖 [Documentation](https://anyapiplugin.com/documentation/?utm_source=starter&utm_medium=readme&utm_campaign=docs) | 💬 [Support](https://wordpress.org/support/plugin/anyapi/)
 
 = Why AnyAPI? =
 
@@ -88,7 +88,7 @@ AnyAPI connects WooCommerce to any REST API including:
 
 AnyAPI's free version on WordPress.org is fully functional — not a crippled demo. You get 1 API integration, 3 order triggers, unlimited API calls (throttled after 500/month), and real-time API Logs for your last 10 calls.
 
-**[AnyAPI Pro](https://anyapiplugin.com/pricing/)** unlocks more API keys, all order triggers, JSON Filter, full API Log search and statistics, integration templates, and priority support. Plans start at $79/year — a fraction of what you'd pay for monthly SaaS automation tools.
+**[AnyAPI Pro](https://anyapiplugin.com/pricing/?utm_source=starter&utm_medium=readme&utm_campaign=upgrade)** unlocks more API keys, all order triggers, JSON Filter, full API Log search and statistics, integration templates, and priority support. Plans start at $79/year — a fraction of what you'd pay for monthly SaaS automation tools.
 
 == Installation ==
 
@@ -182,6 +182,17 @@ AnyAPI requires WordPress 6.2, WooCommerce 6.0+, and PHP 7.4+.
 
 == Changelog ==
 
+= 2.0.3 (2026-07-10) =
+* Improved - Review prompt now appears only after recent successful automations, not during error troubleshooting
+* Fixed    - Dashboard success rate no longer shows a red "0%" when there are simply no orders yet today
+* Tweak    - Refined the review banner layout for a cleaner dashboard header
+
+= 2.0.2 (2026-06-26) =
+* Added    - Custom static payload override for Starter integrations: send a fixed JSON body instead of full order data.
+* Improved - JSON preview now refreshes correctly when switching filter modes.
+* Fixed    - Editor scrolls to top after saving an integration.
+* Fixed    - API Logs page link corrected.
+
 = 2.0.1 (2026-06-08) =
 * Added: Debug Mode toggle in Settings — enable detailed logging for troubleshooting API integrations
 * Added: Debug log points covering the full integration lifecycle: status change detection, trigger matching, authentication, payload building, JSON filtering, and HTTP response
@@ -236,3 +247,8 @@ AnyAPI requires WordPress 6.2, WooCommerce 6.0+, and PHP 7.4+.
 
 = 1.0.0 (2025-05-27) =
 * Initial release
+
+== Source Code ==
+
+The source code for AnyAPI is available on GitHub:
+https://github.com/Joecyc/anyapi

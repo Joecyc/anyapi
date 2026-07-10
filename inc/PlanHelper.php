@@ -51,7 +51,8 @@ class PlanHelper {
 				'templates'          => 0,
 				'webhook_inbound'    => false,
 				'sites_limit'        => 1,
-				'upgrade_url'        => 'https://anyapiplugin.com/pricing',
+				// UTM-tag the shared upgrade URL at its single source.
+				'upgrade_url'        => anyapi_utm_url( 'https://anyapiplugin.com/pricing', 'plugin', 'upgrade' ),
 				'allowed_triggers'   => self::STARTER_TRIGGERS,
 			),
 			'lite' => array(

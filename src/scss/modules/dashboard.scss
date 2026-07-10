@@ -66,8 +66,10 @@
     var(--anyapi-banner-c) 100%
   );
   border-radius: var(--anyapi-radius);
-  padding: 28px 32px;
-  margin: 0 0 24px;
+  // Tighten banner vertical footprint
+  padding: 18px 28px;
+  // Add top space, align L/R edges with header
+  margin: 12px 24px 16px;
   overflow: hidden;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.1),
@@ -133,12 +135,14 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 20px;
+  // Tighten banner vertical footprint
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .banner-icon {
-  font-size: 36px;
+  // Tighten banner vertical footprint
+  font-size: 28px;
   flex-shrink: 0;
   animation: anyapi-icon-float 3s ease-in-out infinite;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
@@ -160,18 +164,20 @@
 }
 
 .banner-title {
-  font-size: 20px;
+  // Tighten banner vertical footprint
+  font-size: 18px;
   font-weight: 800;
   color: #fff;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   letter-spacing: -0.3px;
 }
 
 .banner-sub {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.8);
-  line-height: 1.5;
-  margin-bottom: 10px;
+  // Tighten banner vertical footprint
+  line-height: 1.4;
+  margin-bottom: 6px;
 }
 
 /* Stat counter chip */
@@ -182,7 +188,8 @@
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 8px;
-  padding: 6px 14px;
+  // Tighten banner vertical footprint
+  padding: 5px 12px;
   font-family: var(--anyapi-font-mono);
   font-size: 13px;
   color: rgba(255, 255, 255, 0.95);
@@ -212,8 +219,9 @@
 }
 
 .banner-stars {
-  margin-top: 10px;
-  font-size: 16px;
+  // Tighten banner vertical footprint
+  margin-top: 6px;
+  font-size: 14px;
   letter-spacing: 2px;
   animation: anyapi-sparkle 2.5s ease-in-out infinite;
 }
@@ -234,6 +242,8 @@
   flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
+  // Nudge buttons clear of the close button
+  padding-right: 6px;
 }
 
 .btn-review {
@@ -288,16 +298,17 @@
 /* Close button */
 .banner-close {
   position: absolute;
-  top: 12px;
-  right: 16px;
+  // Shrink and tuck into corner to stop overlapping the button
+  top: 10px;
+  right: 12px;
   z-index: 2;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: rgba(255, 255, 255, 0.7);
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -588,6 +599,10 @@
   }
   &.danger {
     color: var(--anyapi-danger);
+  }
+  // Neutral state when there are no calls today
+  &.muted {
+    color: var(--anyapi-text-muted);
   }
 }
 
