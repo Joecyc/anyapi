@@ -5,7 +5,7 @@ Tags: woocommerce, webhooks, api, automation, rest api
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,6 +181,12 @@ AnyAPI requires WordPress 6.2, WooCommerce 6.0+, and PHP 7.4+.
    single click
 
 == Changelog ==
+
+= 2.0.4 (2026-07-27) =
+* Added    - Email destination for order integrations: send order notifications by email (recipient, subject, intro message) with an automatic order summary including per-item weight and dimensions. {{order_id}} is supported in the To and Subject fields.
+* Added    - API Log now records and shows the response body for each call, so failed integrations are self-diagnosable.
+* Fixed    - Order integrations now follow HTTP 3xx redirects correctly (301/302/303 convert to GET), fixing false 400 errors with endpoints like Google Apps Script.
+* Fixed    - API Log now shows the real request method (GET/POST/Email) instead of always POST.
 
 = 2.0.3 (2026-07-10) =
 * Improved - Review prompt now appears only after recent successful automations, not during error troubleshooting

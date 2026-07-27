@@ -1230,6 +1230,12 @@
   border: 1px solid rgba(255, 107, 107, 0.2);
 }
 
+.method-email {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
 .dark-mode .method-post {
   background: rgba(124, 58, 237, 0.18);
   color: #a78bfa;
@@ -1246,6 +1252,10 @@
 .dark-mode .method-delete {
   background: rgba(255, 107, 157, 0.15);
   color: #ff6b9d;
+}
+.dark-mode .method-email {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
 }
 
 /* HTTP status codes */

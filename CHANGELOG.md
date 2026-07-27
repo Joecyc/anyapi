@@ -7,14 +7,37 @@ All notable changes to this plugin will be documented in this file.
 ## [Unreleased]
 
 ### Architecture
+### Added
+### Changed
+### Removed
+### Fixed
+
+---
+
+## [2.0.4] (2026-07-27)
+
+### Architecture
 
 ### Added
+- API log now stores and displays the response body (first 2KB) for each call, on both the API Log page and the Dashboard's Real-Time API Log widget, making failed integrations self-diagnosable.
+- F-17 (backend): Email destination type for Order Integrations — wp_mail dispatch, `{{order_id}}` in To/Subject, preamble + live-order summary (incl. per-item weight/dimensions), Starter cap 1 via `email_destinations`.
+- F-17 (UI): Email destination in the integration wizard — destination selector, recipient/subject/preamble fields, email-aware Step 3/summary.
+- F-16 (Lite): styles for the response block in the API Log expandable row.
 
 ### Changed
+- Expanded API log response now caps at 200px with a scrollable box, so long response bodies no longer stretch the table row.
 
 ### Removed
 
 ### Fixed
+- LG-5: Dashboard log widget now shows the real HTTP method (was hardcoded POST).
+- F-16 (Lite widget): Dashboard log widget shows Response instead of Payload.
+- Order integrations now follow HTTP 3xx redirects correctly, converting to GET on 301/302/303 as required by the HTTP spec. Previously the original method and body were reused on redirect, causing endpoints such as Google Apps Script Web Apps to return a false 400 in the API log even though the request had succeeded.
+- F-17 (UI polish): email integrations show recipient in list; summary hides URL-only cards for email; Step 3 description hidden for email; Preamble label renamed to "Intro Message".
+- F-17 (UI): email summary now hides URL-only cards ([hidden] vs display:flex).
+- F-17: email body decodes HTML entities ($, ×) from WooCommerce formatted totals/dimensions; log shows mailto: recipient instead of an http:// prefix.
+- F-17: server-rendered integration list now shows recipient for email destinations after refresh; log stores mailto: recipient.
+- F-17: dimensions fallback now shows "—" (was "N/A") to match the weight fallback.
 
 ---
 

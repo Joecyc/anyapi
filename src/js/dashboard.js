@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
         '<td><div class="skeleton long"></div></td>' +
         '<td><div class="skeleton status"></div></td>' +
         '<td><div class="skeleton short"></div></td>' +
-        '<td><div class="skeleton payload"></div></td>' +
+        '<td><div class="skeleton response"></div></td>' +
         "</tr>";
     }
     tableBody.innerHTML = html;
@@ -348,17 +348,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     tableBody.innerHTML = logs
       .map(function (log) {
-        var payloadRaw = log.payload || "";
-        var payload =
-          payloadRaw.length > 80
-            ? payloadRaw.slice(0, 80) + "\u2026"
-            : payloadRaw;
+        var method = String(log.method || "POST").toUpperCase();
+        var methodCls = "method-" + method.toLowerCase();
+        var responseRaw = log.response || "";
+        var response =
+          responseRaw.length > 80
+            ? responseRaw.slice(0, 80) + "\u2026"
+            : responseRaw;
         return (
           "<tr>" +
           "<td><strong>" +
           formatTime(log.timestamp) +
           "</strong></td>" +
-          '<td><span class="method method-post">POST</span></td>' +
+          '<td><span class="method ' +
+          methodCls +
+          '">' +
+          escHtml(method) +
+          "</span></td>" +
           '<td class="endpoint"><code>' +
           escHtml(log.api_url || "\u2014") +
           "</code></td>" +
@@ -368,8 +374,8 @@ document.addEventListener("DOMContentLoaded", function () {
           "<td>" +
           (log.latency ? log.latency + " ms" : "\u2014") +
           "</td>" +
-          '<td class="payload"><pre>' +
-          escHtml(payload) +
+          '<td class="response"><pre>' +
+          escHtml(response) +
           "</pre></td>" +
           "</tr>"
         );

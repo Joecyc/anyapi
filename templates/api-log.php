@@ -118,6 +118,7 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
             <th class="al-th--status"><?php esc_html_e( 'Status', 'anyapi' ); ?></th>
             <th class="al-th--trigger"><?php esc_html_e( 'Trigger', 'anyapi' ); ?></th>
             <th class="al-th--url"><?php esc_html_e( 'Endpoint', 'anyapi' ); ?></th>
+            <th class="al-th--response"><?php esc_html_e( 'Response', 'anyapi' ); ?></th>
             <th class="al-th--latency"><?php esc_html_e( 'Latency', 'anyapi' ); ?></th>
             <th class="al-th--time"><?php esc_html_e( 'Time', 'anyapi' ); ?></th>
           </tr>
@@ -129,10 +130,16 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
                         : ( $http_code >= 400 ? 'is-4xx'
                         : ( $http_code >= 200 ? 'is-2xx' : 'is-other' ) );
             $trigger    = $row['trigger'] ?? '—';
-            // Endpoint: parse path only
-            $endpoint   = isset( $row['api_url'] )
-                          ? wp_parse_url( $row['api_url'], PHP_URL_PATH )
-                          : '—';
+            // Endpoint: parse path, fall back to host when path is empty or "/"
+            $log_api_url = $row['api_url'] ?? '';
+            if ( str_starts_with( $log_api_url, 'mailto:' ) ) {
+              // mailto: URLs have no host/path split — show the scheme + address as-is.
+              $endpoint = $log_api_url;
+            } else {
+              $url_path = $log_api_url ? wp_parse_url( $log_api_url, PHP_URL_PATH ) : '';
+              $url_host = $log_api_url ? wp_parse_url( $log_api_url, PHP_URL_HOST ) : '';
+              $endpoint = ( $url_path && '/' !== $url_path ) ? $url_path : ( $url_host ?: '—' );
+            }
             $latency    = isset( $row['latency'] )
                           ? esc_html( $row['latency'] ) . 'ms'
                           : '—';
@@ -140,6 +147,8 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
             $time_str   = isset( $row['timestamp'] )
                           ? substr( $row['timestamp'], 11, 8 )
                           : '—';
+            $response_full = (string) ( $row['response'] ?? '' );
+            $response_preview = mb_substr( $response_full, 0, 120 );
           ?>
           <tr>
             <td><?php echo isset( $row['order_id'] ) ? '#' . esc_html( $row['order_id'] ) : '—'; ?></td>
@@ -154,7 +163,19 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
               </span>
             </td>
             <td class="al-ep" title="<?php echo esc_attr( $row['api_url'] ?? '' ); ?>">
-              <?php echo esc_html( $endpoint ?: '/' ); ?>
+              <?php echo esc_html( $endpoint ); ?>
+            </td>
+            <td class="al-td--response">
+              <?php if ( '' === $response_full ) : ?>
+                —
+              <?php elseif ( mb_strlen( $response_full ) <= 120 ) : ?>
+                <?php echo esc_html( $response_full ); ?>
+              <?php else : ?>
+                <details class="al-response-details">
+                  <summary><?php echo esc_html( $response_preview ); ?>&hellip;</summary>
+                  <pre class="al-response-full"><?php echo esc_html( $response_full ); ?></pre>
+                </details>
+              <?php endif; ?>
             </td>
             <td><?php echo esc_html( $latency ); ?></td>
             <td class="al-td--time"><?php echo esc_html( $time_str ); ?></td>

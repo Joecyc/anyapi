@@ -77,7 +77,7 @@ class OrderIntegrations {
     $fired_triggers = self::STATUS_TRIGGER_MAP[ $status ];
     $integrations   = get_option( self::INTEGRATION_KEY, array() );
 
-    // [F-7] Debug log — L1: hook fired
+    // Debug log — L1: hook fired
     \Anyapi\AnyapiDebug::log( 'trigger', 'Status change detected', array(
       'order_id'   => $order_id,
       'new_status' => $status,
@@ -90,7 +90,7 @@ class OrderIntegrations {
     // ── Loop integrations & fire matching ones ─────────────────────────────
     foreach ( $integrations as $integration ) {
 
-      // [F-7] Debug log — L2: integration loop start
+      // Debug log — L2: integration loop start
       \Anyapi\AnyapiDebug::log( 'trigger', 'Checking integration', array(
         'integration_id'   => $integration['id'] ?? '',
         'integration_name' => $integration['name'] ?? '',
@@ -100,7 +100,7 @@ class OrderIntegrations {
 
       // Skip inactive integrations
       if ( ( $integration['status'] ?? 'active' ) !== 'active' ) {
-        // [F-7] Debug log — L3: skip reason
+        // Debug log — L3: skip reason
         \Anyapi\AnyapiDebug::log( 'trigger', 'Skipped: status inactive', array(
           'integration_id' => $integration['id'] ?? '',
         ) );
@@ -112,7 +112,7 @@ class OrderIntegrations {
 
       // Check trigger matches this status event
       if ( ! in_array( $trigger, $fired_triggers, true ) ) {
-        // [F-7] Debug log — L3: skip reason
+        // Debug log — L3: skip reason
         \Anyapi\AnyapiDebug::log( 'trigger', 'Skipped: trigger mismatch (expected one of: ' . implode( ', ', $fired_triggers ) . ', got: ' . $trigger . ')', array(
           'integration_id' => $integration['id'] ?? '',
         ) );
@@ -134,7 +134,7 @@ class OrderIntegrations {
 
       // Check trigger against allowed list (null = all triggers allowed)
       if ( $allowed_triggers !== null && ! in_array( $trigger, (array) $allowed_triggers, true ) ) {
-        // [F-7] Debug log — L3: skip reason
+        // Debug log — L3: skip reason
         \Anyapi\AnyapiDebug::log( 'trigger', 'Skipped: trigger not in Starter whitelist', array(
           'integration_id' => $integration['id'] ?? '',
         ) );
@@ -143,14 +143,14 @@ class OrderIntegrations {
 
       // Deferred: PlanHelper::canFire() checks cap and schedules Cron retry if exceeded.
       if ( ! \Anyapi\PlanHelper::canFire( $trigger, $order_id, $integration_id ) ) {
-        // [F-7] Debug log — L3: skip reason
+        // Debug log — L3: skip reason
         \Anyapi\AnyapiDebug::log( 'trigger', 'Skipped: monthly limit reached', array(
           'integration_id' => $integration['id'] ?? '',
         ) );
         continue;
       }
 
-      // [F-7] Debug log — L4: fire decision
+      // Debug log — L4: fire decision
       \Anyapi\AnyapiDebug::log( 'trigger', 'Firing integration', array(
         'integration_id' => $integration['id'] ?? '',
         'order_id'       => $order_id,
@@ -182,6 +182,98 @@ class OrderIntegrations {
   }
 
   // =========================================================================
+  // requestFollowingRedirects — manual 3xx follower with RFC 7231 method rewriting
+  // =========================================================================
+
+  /**
+   * wp_remote_request() with redirection > 0 would reuse the original method on
+   * 3xx, breaking endpoints (e.g. Google Apps Script) that redirect POST to a
+   * GET-only URL. We disable WP's auto-follow and rewrite methods ourselves.
+   */
+  private function requestFollowingRedirects( string $url, array $args, int $max_hops = 3 ): array {
+
+    $current_url    = $url;
+    $current_args   = $args;
+    $current_method = $args['method'] ?? 'GET';
+    $hop_count      = 0;
+
+    while ( true ) {
+
+      $current_args['redirection'] = 0;
+      $current_args['method']      = $current_method;
+
+      $response = wp_remote_request( $current_url, $current_args );
+
+      if ( is_wp_error( $response ) ) {
+        return array(
+          'response'     => $response,
+          'final_url'    => $current_url,
+          'final_method' => $current_method,
+          'hops'         => $hop_count,
+        );
+      }
+
+      $code = wp_remote_retrieve_response_code( $response );
+
+      if ( ! in_array( $code, array( 301, 302, 303, 307, 308 ), true ) ) {
+        return array(
+          'response'     => $response,
+          'final_url'    => $current_url,
+          'final_method' => $current_method,
+          'hops'         => $hop_count,
+        );
+      }
+
+      $location = wp_remote_retrieve_header( $response, 'location' );
+      if ( empty( $location ) ) {
+        return array(
+          'response'     => $response,
+          'final_url'    => $current_url,
+          'final_method' => $current_method,
+          'hops'         => $hop_count,
+        );
+      }
+
+      if ( $hop_count >= $max_hops ) {
+        return array(
+          'response'     => $response,
+          'final_url'    => $current_url,
+          'final_method' => $current_method,
+          'hops'         => $hop_count,
+        );
+      }
+
+      $next_url    = \WP_Http::make_absolute_url( $location, $current_url );
+      $next_method = $current_method;
+      $next_args   = $current_args;
+
+      if ( in_array( $code, array( 301, 302, 303 ), true ) ) {
+        $next_method = 'GET';
+        unset( $next_args['body'] );
+        foreach ( array_keys( $next_args['headers'] ?? array() ) as $header_key ) {
+          if ( strtolower( $header_key ) === 'content-type' ) {
+            unset( $next_args['headers'][ $header_key ] );
+          }
+        }
+      }
+
+      \Anyapi\AnyapiDebug::log( 'fire', 'Redirect followed', array(
+        'from_url'    => $current_url,
+        'to_url'      => $next_url,
+        'status_code' => $code,
+        'from_method' => $current_method,
+        'to_method'   => $next_method,
+      ) );
+
+      $current_url    = $next_url;
+      $current_method = $next_method;
+      $current_args   = $next_args;
+      $hop_count++;
+
+    }
+  }
+
+  // =========================================================================
   // fireIntegration — build payload and send HTTP request
   // =========================================================================
 
@@ -195,7 +287,7 @@ class OrderIntegrations {
     $api_key_ref = $integration['api_key_id'] ?? $integration['api_key'] ?? '';
     $auth_header = $this->resolveAuth( $api_key_ref );
 
-    // [F-7] Debug log
+    // Debug log
     \Anyapi\AnyapiDebug::log( 'fire', 'Auth resolved', array(
       'integration_id' => $integration['id'] ?? '',
       'api_key_ref'    => $api_key_ref,
@@ -208,9 +300,7 @@ class OrderIntegrations {
     $order_data  = $order->get_data();
 
     if ( $filter_mode === 'basic' ) {
-      // Basic mode is a static passthrough: no {{variable}} interpolation.
-      // Empty or {} sends the full WC order data; a non-empty static JSON is
-      // sent exactly as written and overrides the order data.
+      // Basic mode: empty payload sends full order data; static JSON sent as-is.
       $decoded = json_decode( $raw_payload, true );
       if ( '' === $raw_payload || empty( $decoded ) ) {
         $payload_json = wp_json_encode( $order_data );
@@ -225,7 +315,7 @@ class OrderIntegrations {
       );
     }
 
-    // [F-7] Debug log
+    // Debug log
     \Anyapi\AnyapiDebug::log( 'fire', 'Payload built (pre-filter)', array(
       'integration_id'  => $integration['id'] ?? '',
       'filter_mode'     => $filter_mode,
@@ -244,7 +334,7 @@ class OrderIntegrations {
       $order_data
     );
 
-    // [F-7] Debug log
+    // Debug log
     \Anyapi\AnyapiDebug::log( 'fire', 'Payload after filter', array(
       'integration_id'  => $integration['id'] ?? '',
       'filter_mode'     => $filter_mode,
@@ -258,10 +348,37 @@ class OrderIntegrations {
       $filtered_payload = $this->interpolatePayload( $filtered_payload, $order );
     }
 
+    // ── Email destination ───────────────────────────────────────────────────
+    $destination_type = $integration['destination_type'] ?? 'url';
+    if ( 'email' === $destination_type ) {
+      $to      = $this->interpolateOrderId( $integration['email_to'] ?? '', $order_id );
+      $subject = $this->interpolateOrderId( $integration['email_subject'] ?? '', $order_id );
+      $body    = trim( (string) ( $integration['email_preamble'] ?? '' ) );
+      $summary = $this->buildOrderSummary( $order_id );
+      $body    = ( '' !== $body ) ? $body . "\n\n" . $summary : $summary;
+
+      $start   = microtime( true );
+      $sent    = wp_mail( $to, $subject, $body );
+      $latency = (int) round( ( microtime( true ) - $start ) * 1000 );
+
+      $this->writeLog( array(
+        'order_id'  => $order_id,
+        'http_code' => $sent ? 200 : 0,
+        'status'    => $sent ? 'success' : 'error',
+        'trigger'   => $integration['trigger'],
+        'method'    => 'EMAIL',
+        'api_url'   => 'mailto:' . $to,
+        'payload'   => $body,
+        'response'  => $sent ? 'Email sent' : 'wp_mail failed',
+        'latency'   => $latency,
+      ) );
+      return;
+    }
+
     // ── HTTP request ──────────────────────────────────────────────────────
     $api_url     = $integration['api_url']     ?? '';
-    $http_method = $integration['http_method'] ?? 'POST';   // [NEW] default POST
-    $custom_hdrs = $integration['headers']     ?? array();  // [NEW] [{key,value},...]
+    $http_method = $integration['http_method'] ?? 'POST';   // Default POST
+    $custom_hdrs = $integration['headers']     ?? array();  // [{key,value},...]
 
     if ( empty( $api_url ) ) {
       return;
@@ -294,15 +411,18 @@ class OrderIntegrations {
       'timeout' => 15,
     );
 
-    $response = wp_remote_request( $api_url, $args );  // wp_remote_request supports PUT/PATCH
+    $result       = $this->requestFollowingRedirects( $api_url, $args );
+    $response     = $result['response'];
+    $final_url    = $result['final_url'];
+    $final_method = $result['final_method'];
 
     $latency_ms = (int) round( ( microtime( true ) - $start_time ) * 1000 );
 
-    // [F-7] Debug log
+    // Debug log
     if ( is_wp_error( $response ) ) {
       \Anyapi\AnyapiDebug::log( 'fire', 'HTTP error (WP_Error)', array(
         'integration_id' => $integration['id'] ?? '',
-        'url'            => $api_url,
+        'url'            => $final_url,
         'error_message'  => $response->get_error_message(),
       ) );
     } else {
@@ -310,23 +430,26 @@ class OrderIntegrations {
       $resp_body = wp_remote_retrieve_body( $response );
       \Anyapi\AnyapiDebug::log( 'fire', 'HTTP response', array(
         'integration_id' => $integration['id'] ?? '',
-        'url'            => $api_url,
-        'method'         => $http_method,
+        'url'            => $final_url,
+        'method'         => $final_method,
         'response_code'  => $resp_code,
         'response_body'  => mb_substr( $resp_body, 0, 500 ),
       ) );
     }
 
     // ── Log result ────────────────────────────────────────────────────────
+    // Log the final method/URL after redirects, not the originally configured
+    // ones, so the log reflects what actually happened over the wire.
     if ( is_wp_error( $response ) ) {
       $this->writeLog( array(
         'order_id'  => $order_id,
         'http_code' => 0,
         'status'    => 'error',
         'trigger'   => $integration['trigger'],
-        'method'    => $http_method,
-        'api_url'   => $api_url,
+        'method'    => $final_method,
+        'api_url'   => $final_url,
         'payload'   => $filtered_payload,
+        'response'  => $response->get_error_message(),
         'latency'   => null,
       ) );
       return;
@@ -340,9 +463,10 @@ class OrderIntegrations {
       'http_code' => $http_code,
       'status'    => $status,
       'trigger'   => $integration['trigger'],
-      'method'    => $http_method,
-      'api_url'   => $api_url,
+      'method'    => $final_method,
+      'api_url'   => $final_url,
       'payload'   => $filtered_payload,
+      'response'  => wp_remote_retrieve_body( $response ),
       'latency'   => $latency_ms,
     ) );
 
@@ -485,6 +609,66 @@ class OrderIntegrations {
   }
 
   // =========================================================================
+  // Email destination helpers
+  // =========================================================================
+
+  /**
+   * Targeted single-token replace for email To/Subject fields.
+   * Deliberately does not call interpolatePayload() — the full {{}} engine
+   * stays Lite+/Expert-only.
+   */
+  private function interpolateOrderId( string $text, int $order_id ): string {
+    return str_replace( '{{order_id}}', (string) $order_id, $text );
+  }
+
+  /**
+   * Build a plain-text order summary from the live order object.
+   * Reads wc_get_order() directly rather than the stored payload array,
+   * since store-api orders serialize line_items to null stubs.
+   */
+  private function buildOrderSummary( int $order_id ): string {
+    $order = wc_get_order( $order_id );
+    if ( ! $order ) {
+      return '';
+    }
+
+    $w_unit = get_option( 'woocommerce_weight_unit', '' );
+    $lines  = array();
+    $lines[] = sprintf( 'Order #%s — %s', $order->get_order_number(), $order->get_status() );
+    $lines[] = 'Date: ' . $order->get_date_created()?->date( 'Y-m-d H:i' );
+    $lines[] = sprintf(
+      'Customer: %s %s <%s>',
+      $order->get_billing_first_name(),
+      $order->get_billing_last_name(),
+      $order->get_billing_email()
+    );
+    $lines[] = 'Items:';
+    foreach ( $order->get_items() as $item ) {
+      $product = $item->get_product();
+      $name    = $item->get_name();
+      $qty     = $item->get_quantity();
+      $total   = $order->get_formatted_line_subtotal( $item ); // includes currency
+      $lines[] = sprintf( '  - %s × %s — %s', $name, $qty, wp_strip_all_tags( $total ) );
+
+      $weight = ( $product && '' !== $product->get_weight() )
+        ? $product->get_weight() . ' ' . $w_unit
+        : '—';
+      // wc_format_dimensions() already appends the dimension unit.
+      $dims = ( $product ) ? wc_format_dimensions( $product->get_dimensions( false ) ) : '';
+      if ( '' === $dims || 'N/A' === $dims ) {
+        $dims = '—';
+      }
+      $lines[] = sprintf( '      Weight: %s  |  Dimensions: %s', $weight, $dims );
+    }
+    $lines[] = 'Total: ' . wp_strip_all_tags( $order->get_formatted_order_total() );
+
+    $summary = implode( "\n", $lines );
+
+    // WooCommerce formatted totals/dimensions return HTML entities; decode for plain-text email.
+    return html_entity_decode( $summary, ENT_QUOTES, 'UTF-8' );
+  }
+
+  // =========================================================================
   // Write to DB log table
   // =========================================================================
 
@@ -504,15 +688,17 @@ class OrderIntegrations {
         'method'    => sanitize_text_field( $entry['method'] ?? 'POST' ),
         'api_url'   => esc_url_raw( $entry['api_url'] ),
         'payload'   => $entry['payload'],
+        // Not sanitize_text_field()'d — raw JSON/HTML is needed for debugging; escape on output instead.
+        'response'  => mb_substr( (string) ( $entry['response'] ?? '' ), 0, 2000 ),
         'latency'   => isset( $entry['latency'] ) ? intval( $entry['latency'] ) : null,
       ),
-      array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d' )
+      array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d' )
     );
 
     // Invalidate log count cache
     wp_cache_delete( 'anyapi_log_count', 'anyapi_log_cache' );
 
-    // Keep anyapi_log_count option in sync (used by review banner)
+    // Keep log count in sync (used by review banner)
     $count = get_option( 'anyapi_log_count', 0 );
     update_option( 'anyapi_log_count', intval( $count ) + 1 );
 

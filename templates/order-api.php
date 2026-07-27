@@ -173,11 +173,15 @@ $trigger_labels = array_map( fn( $t ) => $t['icon'] . ' ' . $t['label'], $all_tr
             <?php endif; ?>
           </td>
           <td><?php echo esc_html( $trigger_label ); ?></td>
+          <?php if ( ( $rec['destination_type'] ?? 'url' ) === 'email' ) : ?>
+          <td class="oi-col-url">✉️ <?php echo esc_html( $rec['email_to'] ?? '' ); ?></td>
+          <?php else : ?>
           <td class="oi-col-url">
             <code title="<?php echo esc_attr( $rec['api_url'] ?? '' ); ?>">
               <?php echo esc_html( $api_url_short ); ?>
             </code>
           </td>
+          <?php endif; ?>
           <td><?php echo esc_html( ucfirst( $rec['filter_mode'] ?? 'basic' ) ); ?></td>
           <td>
             <label class="oi-toggle" title="<?php esc_attr_e( 'Toggle active', 'anyapi' ); ?>">
@@ -282,6 +286,19 @@ $trigger_labels = array_map( fn( $t ) => $t['icon'] . ' ' . $t['label'], $all_tr
             <p class="description"><?php esc_html_e( 'Set up your API endpoint, authentication, and base payload.', 'anyapi' ); ?></p>
           </div>
 
+          <!-- Destination type -->
+          <div class="form-group">
+            <label><?php esc_html_e( 'Destination Type', 'anyapi' ); ?></label>
+            <div class="dest-selector">
+              <button class="dest-btn active" data-dest="url" type="button">
+                <span class="mode-icon">🔗</span><span class="mode-label"><?php esc_html_e( 'URL / API', 'anyapi' ); ?></span>
+              </button>
+              <button class="dest-btn" data-dest="email" type="button">
+                <span class="mode-icon">✉️</span><span class="mode-label"><?php esc_html_e( 'Email', 'anyapi' ); ?></span>
+              </button>
+            </div>
+          </div>
+
           <!-- Integration name -->
           <div class="form-group">
             <label for="integration-name"><?php esc_html_e( 'Integration Name', 'anyapi' ); ?></label>
@@ -290,6 +307,7 @@ $trigger_labels = array_map( fn( $t ) => $t['icon'] . ' ' . $t['label'], $all_tr
             <p class="help-text"><?php esc_html_e( 'Optional. Helps you identify this integration in the list.', 'anyapi' ); ?></p>
           </div>
 
+          <div id="dest-url-fields">
           <!-- API URL -->
           <div class="form-group">
             <label for="api-url"><?php esc_html_e( 'API URL', 'anyapi' ); ?> <span class="required">*</span></label>
@@ -357,6 +375,27 @@ $trigger_labels = array_map( fn( $t ) => $t['icon'] . ' ' . $t['label'], $all_tr
             </p>
             <div class="error-message" id="payload-error"></div>
           </div>
+          </div><!-- /#dest-url-fields -->
+
+          <div id="dest-email-fields" hidden>
+            <div class="form-group">
+              <label for="email-to"><?php esc_html_e( 'Recipient Email', 'anyapi' ); ?> <span class="required">*</span></label>
+              <input type="text" id="email-to" class="widefat" placeholder="orders@example.com or {{order_id}}@…">
+              <p class="help-text"><?php esc_html_e( 'You can use {{order_id}} in this field.', 'anyapi' ); ?></p>
+              <div class="error-message" id="email-to-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="email-subject"><?php esc_html_e( 'Subject', 'anyapi' ); ?> <span class="required">*</span></label>
+              <input type="text" id="email-subject" class="widefat" placeholder="<?php esc_attr_e( 'New order #{{order_id}}', 'anyapi' ); ?>">
+              <div class="error-message" id="email-subject-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="email-preamble"><?php esc_html_e( 'Intro Message (optional)', 'anyapi' ); ?></label>
+              <textarea id="email-preamble" class="widefat code-textarea" rows="4"
+                placeholder="<?php esc_attr_e( 'Intro text shown above the order summary…', 'anyapi' ); ?>"></textarea>
+              <p class="help-text"><?php esc_html_e( 'A fixed order summary (items, weight, dimensions, total) is appended automatically.', 'anyapi' ); ?></p>
+            </div>
+          </div><!-- /#dest-email-fields -->
 
           <div class="form-actions">
             <button class="oi-btn oi-btn--primary oi-btn--hero next-step" data-next="2" type="button">
@@ -418,9 +457,10 @@ $trigger_labels = array_map( fn( $t ) => $t['icon'] . ' ' . $t['label'], $all_tr
         <div class="step-panel" data-step="3">
           <div class="panel-header">
             <h2>JSON Filter</h2>
-            <p class="description"><?php esc_html_e( 'Choose what order data gets sent in the API payload.', 'anyapi' ); ?></p>
+            <p class="description" id="step3-desc"><?php esc_html_e( 'Choose what order data gets sent in the API payload.', 'anyapi' ); ?></p>
           </div>
 
+          <div id="filter-ui-wrap">
           <div class="filter-mode-selector">
             <button class="filter-mode-btn active" data-mode="basic" type="button">
               <span class="mode-icon">📦</span>
@@ -515,6 +555,11 @@ $trigger_labels = array_map( fn( $t ) => $t['icon'] . ' ' . $t['label'], $all_tr
               placeholder='{"order_id":"{{order_id}}","customer":"{{billing_first_name}} {{billing_last_name}}","total":"{{order_total}}"}'></textarea>
             <div class="error-message" id="expert-error"></div>
           </div>
+          </div><!-- /#filter-ui-wrap -->
+
+          <div id="email-body-note" hidden>
+            <p class="help-text"><?php esc_html_e( 'Email destinations send a fixed order summary. No JSON filtering needed.', 'anyapi' ); ?></p>
+          </div>
 
           <div class="form-actions">
             <button class="oi-btn oi-btn--ghost oi-btn--hero prev-step" data-prev="2" type="button">← <?php esc_html_e( 'Back', 'anyapi' ); ?></button>
@@ -537,6 +582,8 @@ $trigger_labels = array_map( fn( $t ) => $t['icon'] . ' ' . $t['label'], $all_tr
               <div class="summary-card"><span class="summary-label"><?php esc_html_e( 'Trigger', 'anyapi' ); ?></span><span class="summary-value" id="summary-trigger">—</span></div>
               <div class="summary-card"><span class="summary-label"><?php esc_html_e( 'Filter Mode', 'anyapi' ); ?></span><span class="summary-value" id="summary-mode">—</span></div>
               <div class="summary-card summary-card--full"><span class="summary-label"><?php esc_html_e( 'Fields', 'anyapi' ); ?></span><span class="summary-value" id="summary-fields">—</span></div>
+              <div class="summary-card summary-card--email" id="summary-to-card" hidden><span class="summary-label"><?php esc_html_e( 'Recipient', 'anyapi' ); ?></span><span class="summary-value" id="summary-to">—</span></div>
+              <div class="summary-card summary-card--email" id="summary-subject-card" hidden><span class="summary-label"><?php esc_html_e( 'Subject', 'anyapi' ); ?></span><span class="summary-value" id="summary-subject">—</span></div>
             </div>
             <div id="save-status" class="save-status" style="display:none;"></div>
             <div class="step4-actions">

@@ -509,6 +509,7 @@ class Dashboard {
                 <th><?php esc_html_e( 'Time', 'anyapi' ); ?></th>
                 <th><?php esc_html_e( 'Method', 'anyapi' ); ?></th>
                 <th><?php esc_html_e( 'Endpoint', 'anyapi' ); ?></th>
+                <th class="al-th--response"><?php esc_html_e( 'Response', 'anyapi' ); ?></th>
                 <th><?php esc_html_e( 'Status', 'anyapi' ); ?></th>
                 <th><?php esc_html_e( 'Latency', 'anyapi' ); ?></th>
               </tr>
@@ -516,7 +517,7 @@ class Dashboard {
             <tbody>
               <?php if ( empty( $recent_logs ) ) : ?>
                 <tr>
-                  <td colspan="5" style="text-align:center;padding:32px;color:var(--anyapi-text-muted);">
+                  <td colspan="6" style="text-align:center;padding:32px;color:var(--anyapi-text-muted);">
                     <?php esc_html_e( 'No API logs yet. Trigger a WooCommerce order to see activity.', 'anyapi' ); ?>
                   </td>
                 </tr>
@@ -529,12 +530,28 @@ class Dashboard {
                   $ts_raw    = $row['timestamp'] ?? '';
                   $ts_short  = ( strlen( $ts_raw ) > 10 ) ? substr( $ts_raw, 11, 8 ) : $ts_raw;
                   $ep_full   = $row['api_url'] ?? '—';
-                  $ep_path   = wp_parse_url( $ep_full, PHP_URL_PATH ) ?: $ep_full;
+                  $ep_path   = isset( $row['api_url'] ) ? wp_parse_url( $row['api_url'], PHP_URL_PATH ) : '';
+                  $ep_host   = isset( $row['api_url'] ) ? wp_parse_url( $row['api_url'], PHP_URL_HOST ) : '';
+                  $ep_display = ( $ep_path && '/' !== $ep_path ) ? $ep_path : ( $ep_host ?: $ep_full );
+                  $response_full    = (string) ( $row['response'] ?? '' );
+                  $response_preview = mb_substr( $response_full, 0, 120 );
                 ?>
                 <tr>
                   <td class="al-time"><?php echo esc_html( $ts_short ); ?></td>
                   <td><span class="al-method"><?php echo esc_html( $method ); ?></span></td>
-                  <td class="al-ep" title="<?php echo esc_attr( $ep_full ); ?>"><?php echo esc_html( $ep_path ); ?></td>
+                  <td class="al-ep" title="<?php echo esc_attr( $ep_full ); ?>"><?php echo esc_html( $ep_display ); ?></td>
+                  <td class="al-td--response">
+                    <?php if ( '' === $response_full ) : ?>
+                      —
+                    <?php elseif ( mb_strlen( $response_full ) <= 120 ) : ?>
+                      <?php echo esc_html( $response_full ); ?>
+                    <?php else : ?>
+                      <details class="al-response-details">
+                        <summary><?php echo esc_html( $response_preview ); ?>&hellip;</summary>
+                        <pre class="al-response-full"><?php echo esc_html( $response_full ); ?></pre>
+                      </details>
+                    <?php endif; ?>
+                  </td>
                   <td><span class="al-code <?php echo esc_attr( $badge_cls ); ?>"><?php echo esc_html( $code ?: '—' ); ?></span></td>
                   <td><?php echo esc_html( $latency ); ?></td>
                 </tr>
@@ -604,7 +621,7 @@ class Dashboard {
               <th class="column-endpoint"><?php esc_html_e( 'Endpoint', 'anyapi' ); ?></th>
               <th class="column-status"><?php esc_html_e( 'Status', 'anyapi' ); ?></th>
               <th class="column-latency"><?php esc_html_e( 'Latency', 'anyapi' ); ?></th>
-              <th class="column-payload"><?php esc_html_e( 'Payload', 'anyapi' ); ?></th>
+              <th class="column-response"><?php esc_html_e( 'Response', 'anyapi' ); ?></th>
             </tr>
           </thead>
           <tbody id="anyapi-logs-body">

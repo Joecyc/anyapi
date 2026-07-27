@@ -33,6 +33,7 @@ class ApiLog {
         echo 'Action : '       . esc_html( $row->trigger ) . "\n";
         echo 'API URL : '      . esc_html( $row->api_url ) . "\n";
         echo 'Payload : '      . esc_html( json_encode( json_decode( $row->payload ), JSON_PRETTY_PRINT ) ) . "\n";
+        echo 'Response : '     . esc_html( $row->response ?? '' ) . "\n";
         echo 'Date Created : ' . esc_html( $row->timestamp ) . "\n";
         echo "------------------------------------------------------------------------------------------------\n";
       }

@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Step 1
     apiKeyId: "", // ak_xxx ID
+    destinationType: "url",
 
     // Step 3
     filterMode: "basic",
@@ -155,6 +156,48 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   // ===========================================================================
+  // Destination type (Step 1: URL vs Email)
+  // ===========================================================================
+
+  function applyDestinationUI(type) {
+    state.destinationType = type;
+
+    document.querySelectorAll(".dest-btn").forEach((b) => {
+      b.classList.toggle("active", b.dataset.dest === type);
+    });
+
+    const urlFields = document.getElementById("dest-url-fields");
+    const emailFields = document.getElementById("dest-email-fields");
+    const filterUiWrap = document.getElementById("filter-ui-wrap");
+    const emailBodyNote = document.getElementById("email-body-note");
+    const step3Desc = document.getElementById("step3-desc");
+
+    if (type === "email") {
+      if (urlFields) urlFields.hidden = true;
+      if (emailFields) emailFields.hidden = false;
+      if (filterUiWrap) filterUiWrap.hidden = true;
+      if (emailBodyNote) emailBodyNote.hidden = false;
+      if (step3Desc) step3Desc.hidden = true;
+      state.filterMode = "basic";
+      filterModeBtns.forEach((b) =>
+        b.classList.toggle("active", b.dataset.mode === "basic"),
+      );
+    } else {
+      if (urlFields) urlFields.hidden = false;
+      if (emailFields) emailFields.hidden = true;
+      if (filterUiWrap) filterUiWrap.hidden = false;
+      if (emailBodyNote) emailBodyNote.hidden = true;
+      if (step3Desc) step3Desc.hidden = false;
+    }
+
+    clearErrors();
+  }
+
+  document.querySelectorAll(".dest-btn").forEach((btn) => {
+    btn.addEventListener("click", () => applyDestinationUI(btn.dataset.dest));
+  });
+
+  // ===========================================================================
   // Wizard open / close
   // ===========================================================================
 
@@ -192,10 +235,19 @@ document.addEventListener("DOMContentLoaded", function () {
     state.searchQuery = "";
 
     // Clear inputs
-    ["integration-name", "api-url", "api-payload"].forEach((id) => {
+    [
+      "integration-name",
+      "api-url",
+      "api-payload",
+      "email-to",
+      "email-subject",
+      "email-preamble",
+    ].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
+
+    applyDestinationUI("url");
 
     const keySelect = document.getElementById("api-key-select");
     if (keySelect) keySelect.value = "";
@@ -293,6 +345,15 @@ document.addEventListener("DOMContentLoaded", function () {
     updateFilterModeUI();
     renderSelectedFields();
     updateJsonPreview();
+
+    // Destination type + email fields
+    applyDestinationUI(record.destination_type || "url");
+    const emailToEl = document.getElementById("email-to");
+    const emailSubjectEl = document.getElementById("email-subject");
+    const emailPreambleEl = document.getElementById("email-preamble");
+    if (emailToEl) emailToEl.value = record.email_to || "";
+    if (emailSubjectEl) emailSubjectEl.value = record.email_subject || "";
+    if (emailPreambleEl) emailPreambleEl.value = record.email_preamble || "";
   }
 
   // ===========================================================================
@@ -354,6 +415,37 @@ document.addEventListener("DOMContentLoaded", function () {
   function validateStep(step) {
     clearErrors();
 
+    if (step === 1 && state.destinationType === "email") {
+      const emailTo = (document.getElementById("email-to")?.value || "").trim();
+      const emailSubject = (
+        document.getElementById("email-subject")?.value || ""
+      ).trim();
+
+      if (!emailTo) {
+        showError(
+          "email-to-error",
+          cfg.i18n?.email_to_required || "Recipient email is required.",
+        );
+        return false;
+      }
+      const testEmail = emailTo.replace(/\{\{order_id\}\}/g, "1");
+      if (!/^\S+@\S+\.\S+$/.test(testEmail)) {
+        showError(
+          "email-to-error",
+          cfg.i18n?.email_to_invalid || "Enter a valid email address.",
+        );
+        return false;
+      }
+      if (!emailSubject) {
+        showError(
+          "email-subject-error",
+          cfg.i18n?.email_subject_required || "Subject is required.",
+        );
+        return false;
+      }
+      return true;
+    }
+
     if (step === 1) {
       const url = (document.getElementById("api-url")?.value || "").trim();
       const keyId = (
@@ -387,9 +479,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         return false;
       }
-      // Payload is optional. Empty = full order data (Basic) or
-      // controlled by the Step 3 filter (advanced/expert). Validate JSON
-      // only when a value is present; no {{variable}} substitution in Basic.
+      // Payload is optional; validate JSON only when present.
       if (payload) {
         try {
           JSON.parse(payload);
@@ -414,6 +504,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (step === 3) {
+      if (state.destinationType === "email") return true;
       if (state.filterMode === "expert" && expertTextarea?.value.trim()) {
         try {
           JSON.parse(expertTextarea.value.trim());
@@ -775,30 +866,56 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===========================================================================
 
   function renderSummary() {
-    const keyId = document.getElementById("api-key-select")?.value || "";
-    const keyName = getKeyName(keyId);
     const trigger =
       document.querySelector(".action-tile.active h3")?.textContent || "—";
-    const mode =
-      state.filterMode.charAt(0).toUpperCase() + state.filterMode.slice(1);
-    const fields =
-      state.filterMode === "basic"
-        ? "All Fields"
-        : state.selectedFields.length + " fields selected";
 
     const set = (id, val) => {
       const el = document.getElementById(id);
       if (el) el.textContent = val;
     };
+    const show = (id, visible) => {
+      const el = document.getElementById(id);
+      if (el) el.hidden = !visible;
+    };
+
     set(
       "summary-name",
       document.getElementById("integration-name")?.value || "—",
     );
-    set("summary-url", document.getElementById("api-url")?.value || "—");
-    set("summary-key", keyName || keyId || "—");
     set("summary-trigger", trigger);
-    set("summary-mode", mode);
-    set("summary-fields", fields);
+
+    const isEmail = state.destinationType === "email";
+
+    ["summary-url", "summary-key", "summary-mode", "summary-fields"].forEach(
+      (id) => {
+        const card = document.getElementById(id)?.closest(".summary-card");
+        if (card) card.hidden = isEmail;
+      },
+    );
+    show("summary-to-card", isEmail);
+    show("summary-subject-card", isEmail);
+
+    if (isEmail) {
+      set("summary-to", document.getElementById("email-to")?.value || "—");
+      set(
+        "summary-subject",
+        document.getElementById("email-subject")?.value || "—",
+      );
+    } else {
+      const keyId = document.getElementById("api-key-select")?.value || "";
+      const keyName = getKeyName(keyId);
+      const mode =
+        state.filterMode.charAt(0).toUpperCase() + state.filterMode.slice(1);
+      const fields =
+        state.filterMode === "basic"
+          ? "All Fields"
+          : state.selectedFields.length + " fields selected";
+
+      set("summary-url", document.getElementById("api-url")?.value || "—");
+      set("summary-key", keyName || keyId || "—");
+      set("summary-mode", mode);
+      set("summary-fields", fields);
+    }
   }
 
   function getKeyName(akId) {
@@ -840,6 +957,16 @@ document.addEventListener("DOMContentLoaded", function () {
     fd.append("selected_fields", JSON.stringify(state.selectedFields));
     fd.append("field_order", JSON.stringify(state.selectedFields));
     fd.append("raw_json_override", expertTextarea?.value || "");
+    fd.append("destination_type", state.destinationType);
+    fd.append("email_to", document.getElementById("email-to")?.value || "");
+    fd.append(
+      "email_subject",
+      document.getElementById("email-subject")?.value || "",
+    );
+    fd.append(
+      "email_preamble",
+      document.getElementById("email-preamble")?.value || "",
+    );
 
     try {
       const res = await fetch(cfg.ajax_url, { method: "POST", body: fd });
@@ -965,7 +1092,11 @@ document.addEventListener("DOMContentLoaded", function () {
         ${keyName ? `<span class="oi-key-badge">🔑 ${escHtml(keyName)}</span>` : ""}
       </td>
       <td>${escHtml(record.trigger)}</td>
-      <td class="oi-col-url"><code title="${escHtml(record.api_url)}">${escHtml(record.api_url.length > 40 ? record.api_url.slice(0, 40) + "…" : record.api_url)}</code></td>
+      <td class="oi-col-url">${
+        record.destination_type === "email"
+          ? `✉️ ${escHtml(record.email_to || "")}`
+          : `<code title="${escHtml(record.api_url)}">${escHtml(record.api_url.length > 40 ? record.api_url.slice(0, 40) + "…" : record.api_url)}</code>`
+      }</td>
       <td>${escHtml(record.filter_mode.charAt(0).toUpperCase() + record.filter_mode.slice(1))}</td>
       <td>
         <label class="oi-toggle">

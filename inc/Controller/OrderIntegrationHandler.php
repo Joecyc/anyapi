@@ -65,6 +65,15 @@ class OrderIntegrationHandler {
     $field_order       = $this->sanitizeFieldArray( json_decode( $raw_field_order, true ) ?? array() );
     $headers           = $this->sanitizeHeaders(    json_decode( $raw_headers,     true ) ?? array() );
 
+    // Destination type
+    $destination_type = sanitize_key( wp_unslash( $_POST['destination_type'] ?? 'url' ) );
+    if ( ! in_array( $destination_type, array( 'url', 'email' ), true ) ) {
+      $destination_type = 'url';
+    }
+    $email_to       = sanitize_email( wp_unslash( $_POST['email_to'] ?? '' ) );
+    $email_subject  = sanitize_text_field( wp_unslash( $_POST['email_subject'] ?? '' ) );
+    $email_preamble = sanitize_textarea_field( wp_unslash( $_POST['email_preamble'] ?? '' ) );
+
     // ── Plan data ─────────────────────────────────────────────────────────
 
     $limits = \Anyapi\PlanHelper::currentLimits();
@@ -74,12 +83,21 @@ class OrderIntegrationHandler {
 
     $errors = array();
 
-    if ( empty( $api_url ) ) {
-      $errors[] = __( 'API URL is required.', 'anyapi' );
-    } elseif ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
-      $errors[] = __( 'Invalid API URL format.', 'anyapi' );
-    } elseif ( strpos( $api_url, 'https://' ) !== 0 ) {
-      $errors[] = __( 'API URL must use HTTPS.', 'anyapi' );
+    if ( 'email' === $destination_type ) {
+      if ( empty( $email_to ) || ! filter_var( $email_to, FILTER_VALIDATE_EMAIL ) ) {
+        $errors[] = __( 'A valid recipient email is required.', 'anyapi' );
+      }
+      if ( '' === trim( $email_subject ) ) {
+        $errors[] = __( 'Email subject is required.', 'anyapi' );
+      }
+    } else {
+      if ( empty( $api_url ) ) {
+        $errors[] = __( 'API URL is required.', 'anyapi' );
+      } elseif ( ! filter_var( $api_url, FILTER_VALIDATE_URL ) ) {
+        $errors[] = __( 'Invalid API URL format.', 'anyapi' );
+      } elseif ( strpos( $api_url, 'https://' ) !== 0 ) {
+        $errors[] = __( 'API URL must use HTTPS.', 'anyapi' );
+      }
     }
 
     // Payload is optional; validate JSON only when present.
@@ -141,6 +159,31 @@ class OrderIntegrationHandler {
       ), 403 );
     }
 
+    // ── Email destination cap gate ──────────────────────────────────
+
+    if ( 'email' === $destination_type ) {
+      $limits_email = $limits['email_destinations'] ?? PHP_INT_MAX;
+      if ( $limits_email !== PHP_INT_MAX ) {
+        $existing    = get_option( self::OPTION_KEY, array() );
+        $email_count = 0;
+        foreach ( $existing as $eid => $er ) {
+          if ( (int) $eid === $integration_id ) {
+            continue; // exclude self on edit
+          }
+          if ( ( $er['destination_type'] ?? 'url' ) === 'email' ) {
+            $email_count++;
+          }
+        }
+        if ( $email_count >= $limits_email ) {
+          wp_send_json_error( array(
+            'message'     => __( 'The Free plan allows 1 email destination. Upgrade for more.', 'anyapi' ),
+            'gate'        => 'email_destinations',
+            'upgrade_url' => $limits['upgrade_url'],
+          ), 403 );
+        }
+      }
+    }
+
     // ── Build & persist ───────────────────────────────────────────────────
 
     $integrations = get_option( self::OPTION_KEY, array() );
@@ -161,6 +204,10 @@ class OrderIntegrationHandler {
       $record['selected_fields']     = $selected_fields;
       $record['field_order']         = $field_order;
       $record['raw_json_override']   = $raw_json_override;
+      $record['destination_type']    = $destination_type;
+      $record['email_to']            = $email_to;
+      $record['email_subject']       = $email_subject;
+      $record['email_preamble']      = $email_preamble;
       $record['updated_at']          = $now;
 
     } else {
@@ -180,6 +227,10 @@ class OrderIntegrationHandler {
         'selected_fields'    => $selected_fields,
         'field_order'        => $field_order,
         'raw_json_override'  => $raw_json_override,
+        'destination_type'   => $destination_type,
+        'email_to'           => $email_to,
+        'email_subject'      => $email_subject,
+        'email_preamble'     => $email_preamble,
         'status'             => 'active',
         'created_at'         => $now,
         'updated_at'         => $now,
@@ -399,6 +450,11 @@ class OrderIntegrationHandler {
     $r['headers']     ??= array();
     $r['updated_at']  ??= $r['created_at'] ?? current_time( 'mysql' );
 
+    $r['destination_type'] ??= 'url';
+    $r['email_to']         ??= '';
+    $r['email_subject']    ??= '';
+    $r['email_preamble']   ??= '';
+
     return $r;
   }
 
@@ -411,6 +467,8 @@ class OrderIntegrationHandler {
       'name'        => $r['name']        ?? 'Integration #' . $r['id'],
       'api_url'     => $r['api_url'],
       'api_key_id'  => $r['api_key_id']  ?? '',  // [CHANGED from api_key]
+      'destination_type' => $r['destination_type'] ?? 'url',
+      'email_to'          => $r['email_to'] ?? '',
       'trigger'     => $r['trigger'],
       'http_method' => $r['http_method'] ?? 'POST',
       'filter_mode' => $r['filter_mode'],

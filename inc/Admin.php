@@ -128,6 +128,7 @@ class Admin {
       `method`    varchar(10)   NOT NULL DEFAULT 'POST',
       `api_url`   text          NOT NULL,
       `payload`   longtext      NOT NULL,
+      `response`  text          NULL,
       `latency`   int           NULL,
       `timestamp` datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
       PRIMARY KEY (`id`)
@@ -330,7 +331,7 @@ class Admin {
     } elseif ( $cache === 'logs' ) {
       // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
       $result = $wpdb->get_results(
-        $wpdb->prepare( "SELECT id, order_id, http_code, status, `trigger`, method, api_url, payload, latency, timestamp FROM {$table} {$where} ORDER BY timestamp DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+        $wpdb->prepare( "SELECT id, order_id, http_code, status, `trigger`, method, api_url, payload, response, latency, timestamp FROM {$table} {$where} ORDER BY timestamp DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
           ...array_merge( $params, array( $perPage, $offset ) )
         ), ARRAY_A
       );
@@ -349,7 +350,7 @@ class Admin {
       return array();
     }
     return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-      $wpdb->prepare( 'SELECT id, order_id, http_code, status, `trigger`, method, api_url, latency, timestamp FROM %i ORDER BY timestamp DESC LIMIT %d', $table, $limit ),
+      $wpdb->prepare( 'SELECT id, order_id, http_code, status, `trigger`, method, api_url, response, latency, timestamp FROM %i ORDER BY timestamp DESC LIMIT %d', $table, $limit ),
       ARRAY_A
     ) ?: array();
   }

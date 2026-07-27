@@ -8,7 +8,7 @@
  * Plugin Name:       AnyAPI
  * Plugin URI:        https://www.anyapiplugin.com
  * Description:       No-Code WooCommerce REST API Integration. Connect Orders to any APIs with Automations, JSON Filter, API logs, and Easy Setup in Minutes.
- * Version:           2.0.3
+ * Version:           2.0.4
  * Author:            JC
  * Author URI:        https://www.anyapiplugin.com
  * License:           GPL v2 or later
@@ -21,9 +21,9 @@ defined( 'ABSPATH' ) or exit;
 
 if ( ! function_exists( 'add_action' ) ) { exit; }
 
-define( 'ANYAPI_RELEASE_DATE', '2026-07-10' );
-define( 'ANYAPI_VERSION', '2.0.3' );
-define( 'ANYAPI_ASSETS', '2.0.8' );
+define( 'ANYAPI_RELEASE_DATE', '2026-07-27' );
+define( 'ANYAPI_VERSION', '2.0.4' );
+define( 'ANYAPI_ASSETS', '2.0.19' );
 
 if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
   require_once dirname( __FILE__ ) . '/vendor/autoload.php';

@@ -54,6 +54,7 @@ class PlanHelper {
 				// UTM-tag the shared upgrade URL at its single source.
 				'upgrade_url'        => anyapi_utm_url( 'https://anyapiplugin.com/pricing', 'plugin', 'upgrade' ),
 				'allowed_triggers'   => self::STARTER_TRIGGERS,
+				'email_destinations' => 1,
 			),
 			'lite' => array(
 				'label'              => 'Lite',
@@ -67,6 +68,7 @@ class PlanHelper {
 				'sites_limit'        => 1,
 				'upgrade_url'        => 'https://anyapiplugin.com/pricing',
 				'allowed_triggers'   => array(),
+				'email_destinations' => PHP_INT_MAX,
 			),
 			'plus' => array(
 				'label'              => 'Plus',
@@ -80,6 +82,7 @@ class PlanHelper {
 				'sites_limit'        => 3,
 				'upgrade_url'        => 'https://anyapiplugin.com/pricing',
 				'allowed_triggers'   => array(),
+				'email_destinations' => PHP_INT_MAX,
 			),
 			'agency' => array(
 				'label'              => 'Agency',
@@ -93,6 +96,7 @@ class PlanHelper {
 				'sites_limit'        => PHP_INT_MAX,
 				'upgrade_url'        => '',
 				'allowed_triggers'   => array(),
+				'email_destinations' => PHP_INT_MAX,
 			),
 		);
 	}

@@ -513,6 +513,9 @@
 .al-th--url {
   /* flex */
 }
+.al-th--response {
+  width: 160px;
+}
 .al-th--latency {
   width: 80px;
   text-align: right;
@@ -522,6 +525,35 @@
 }
 .al-th--expand {
   width: 40px;
+}
+
+.al-td--response {
+  font-size: 12px;
+  color: var(--anyapi-text-muted);
+  max-width: 160px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.al-response-details summary {
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+.al-response-full {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 11px;
+  margin: 4px 0 0;
+  padding: 6px 8px;
+  border: 1px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  background: var(--anyapi-bg);
 }
 
 .al-td--latency {
@@ -688,6 +720,46 @@
   border-radius: var(--anyapi-radius-sm);
   overflow: auto;
   max-height: 300px;
+  white-space: pre;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Response expand row
+   -------------------------------------------------------------------------- */
+.al-response-inner {
+  margin-top: 16px;
+  padding: 16px;
+  border-top: 1px solid rgba(93, 95, 239, 0.22);
+  border-left: 3px solid var(--anyapi-primary);
+}
+
+.al-response-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.al-response-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--anyapi-text-muted);
+}
+
+.al-response-code {
+  background: #1e293b;
+  color: #e2e8f0;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border-radius: var(--anyapi-radius-sm);
+  overflow: auto;
+  max-height: 200px;
+  overflow-y: auto;
   white-space: pre;
   margin: 0;
 }

@@ -13,6 +13,12 @@
   --shadow-float: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
+/* Ensure the HTML [hidden] attribute wins over display values (e.g. .summary-card
+   uses display:flex, which would otherwise override [hidden]'s display:none). */
+[hidden] {
+  display: none !important;
+}
+
 /* --------------------------------------------------------------------------
    Layout
    -------------------------------------------------------------------------- */
@@ -298,6 +304,36 @@ select.widefat:focus {
 }
 
 .filter-mode-btn.active {
+  border-color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.dest-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.dest-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px;
+  border: 2px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius);
+  background: var(--anyapi-card);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dest-btn:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  background: rgba(93, 95, 239, 0.08);
+}
+
+.dest-btn.active {
   border-color: var(--anyapi-primary);
   background: rgba(93, 95, 239, 0.08);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
