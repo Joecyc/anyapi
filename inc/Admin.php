@@ -208,12 +208,15 @@ class Admin {
 
     if ( strpos( $hook, 'anyapi' ) === false ) return;
 
+    add_action( 'admin_head', array( $this, 'printDarkModeInline' ) );
+
     wp_enqueue_style( 'pluginstyle', $this->plugin_url . 'assets/css/style.css', array(), ANYAPI_ASSETS );
 
     // Scripts always loaded on AnyAPI pages
     foreach ( array(
       'anyapi-dashboard' => 'assets/js/dashboard.min.js',
       'anyapi-order'     => 'assets/js/order-api.min.js',
+      'anyapi-templates' => 'assets/js/templates.min.js',
       'settings'         => 'assets/js/settings.min.js',
       'settings-apikey'  => 'assets/js/apikey.min.js',
       'restapi'          => 'assets/js/rest-api.min.js',
@@ -225,6 +228,8 @@ class Admin {
     wp_localize_script( 'anyapi-order',    'anyapiOrder',    Controller\OrderIntegrationHandler::getJsData() );
     wp_localize_script( 'settings-apikey', 'anyapiApiKey',   Controller\ApiKeyHandler::getJsData() );
     wp_localize_script( 'restapi',         'anyapiRestTool', Controller\RestApiHandler::getJsData() );
+    wp_localize_script( 'anyapi-templates', 'anyapiTemplates', \Anyapi\Views\Templates::context() );
+    wp_localize_script( 'anyapi-order',     'anyapiTplPresets', \Anyapi\Views\Templates::getPresetsForJs() );
 
     wp_localize_script( 'settings', 'anyapiSettings', array(
       'ajax_url' => admin_url( 'admin-ajax.php' ),
@@ -240,6 +245,8 @@ class Admin {
       'nonce'       => wp_create_nonce( 'anyapi_logs_nonce' ),
       'plan'        => PlanHelper::currentPlan(),
       'upgrade_url' => admin_url( 'admin.php?page=anyapi_settings#plan' ),
+      'logo_light'  => Anyapi::getImages( 'logo-light' ),
+      'logo_dark'   => Anyapi::getImages( 'logo-dark' ),
       'i18n'        => array(
         'no_logs'       => __( 'No API logs found.', 'anyapi' ),
         'error'         => __( 'Failed to load logs. Please try again.', 'anyapi' ),
@@ -262,6 +269,21 @@ class Admin {
       ),
     ) );
 
+  }
+
+  // Applies the saved theme before first paint, avoiding a light-to-dark flash on load.
+  public function printDarkModeInline(): void {
+    ?>
+    <script>
+    (function () {
+      try {
+        if ( window.localStorage.getItem( 'anyapi-theme' ) === 'dark' ) {
+          document.documentElement.classList.add( 'dark-mode' );
+        }
+      } catch ( e ) {}
+    })();
+    </script>
+    <?php
   }
 
   // ── AJAX Handlers ──────────────────────────────────────────────────────────
@@ -496,18 +518,16 @@ class Admin {
   public function settingsLinks( $links ) {
     $links[] = '<a href="admin.php?page=anyapi">Settings</a>';
     if ( ! self::isProActivate() ) {
-      $links[] = '<a style="color:#f34a4a;" href="https://anyapiplugin.com/pricing">Get AnyAPI Lite</a>';
+      $links[] = '<a style="color:#f34a4a;" href="' . esc_url( anyapi_utm_url( 'https://anyapiplugin.com/pricing', 'plugins_list', 'upgrade' ) ) . '">Get AnyAPI Lite</a>';
     }
     return $links;
   }
 
-  public function customLinks( $links ) {
-    foreach ( $links as $key ) {
-      if ( strpos( $key, 'AnyAPI' ) !== false ) {
-        $links[] = '<a style="color:#f34a4a;" href="https://anyapiplugin.com/documentation">Docs</a>';
-        break;
-      }
+  public function customLinks( $links, $plugin_file = '' ) {
+    if ( $plugin_file !== plugin_basename( dirname( __FILE__, 2 ) ) . '/anyapi.php' ) {
+      return $links;
     }
+    $links[] = '<a style="color:#f34a4a;" href="' . esc_url( anyapi_utm_url( 'https://anyapiplugin.com/documentation', 'plugins_list', 'docs' ) ) . '">Docs</a>';
     return $links;
   }
 
@@ -517,6 +537,7 @@ class Admin {
   public function pageSettings()   { return require_once "{$this->plugin_path}/templates/settings.php"; }
   public function pageApiKey()     { return require_once "{$this->plugin_path}/templates/apikey.php"; }
   public function pageOrderApi()   { return require_once "{$this->plugin_path}/templates/order-api.php"; }
+  public function pageTemplates()  { return require_once "{$this->plugin_path}/templates/templates.php"; }
   public function pageRestApi()    { return require_once "{$this->plugin_path}/templates/rest-api.php"; }
   public function pageApiLog()     { return require_once "{$this->plugin_path}/templates/api-log.php"; }
 

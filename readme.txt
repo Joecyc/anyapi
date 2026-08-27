@@ -1,131 +1,123 @@
-=== AnyAPI – Order to API Automation, Webhooks & No-Code REST API Integration for WooCommerce ===
+=== AnyAPI – WooCommerce Orders to Any REST API, Webhook & Email ===
 Contributors: anyapi
 Donate link:
-Tags: woocommerce, webhooks, api, automation, rest api
+Tags: woocommerce, order notification, email notification, google sheets, erp
 Requires at least: 6.2
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Send WooCommerce orders to any REST API automatically — no code required. Built-in JSON Filter, real-time API Logs, and webhook automation in minutes.
+Send WooCommerce order details anywhere it needs to go — an API, a webhook, or email — automatically. No code, every call logged. Start from a template.
 
 == Description ==
 
-**[AnyAPI](https://www.anyapiplugin.com?utm_source=starter&utm_medium=readme&utm_campaign=home)** is the easiest no-code way to send WooCommerce orders to any REST API or webhook endpoint — with built-in JSON Filter and real-time API Logs.
+**AnyAPI** watches your WooCommerce orders. The moment one comes in, it sends the order details where they need to go — a REST API, a webhook, or an email address.
 
-When an order happens in WooCommerce, AnyAPI sends it anywhere: your ERP, CRM, fulfillment system, accounting software, messaging service, or any custom REST API. No coding required, no expensive monthly SaaS fees.
+That replaces the copying by hand: new orders into your ERP or CRM, a ship notice to your fulfilment partner, a running record of the day's orders, or an alert to the team the moment an order is paid.
 
-🔗 [Official Website](https://anyapiplugin.com?utm_source=starter&utm_medium=readme&utm_campaign=home) | 📖 [Documentation](https://anyapiplugin.com/documentation/?utm_source=starter&utm_medium=readme&utm_campaign=docs) | 💬 [Support](https://wordpress.org/support/plugin/anyapi/)
+Every call is logged, so you can see it arrived — and a temporary failure on the other end is retried on its own. No code, nothing to maintain.
 
-= Why AnyAPI? =
+🔗 [Official Website](https://anyapiplugin.com?utm_source=starter&utm_medium=readme&utm_campaign=home) | 📖 [Documentation](https://anyapiplugin.com/documentation/?utm_source=starter&utm_medium=readme&utm_campaign=docs) | 💬 [Support](https://wordpress.org/support/plugin/anyapi/) | 💻 [Source Code](https://github.com/Joecyc/anyapi)
 
-Most API integration tools are either too complex for store owners or too expensive with per-task pricing. AnyAPI is purpose-built for WooCommerce — it does one thing exceptionally well: **push your order data to any REST API automatically**.
+#### Why AnyAPI?
 
-- **Truly no-code** — built for WooCommerce store owners, not developers. Configure everything through a visual interface in your WordPress admin.
-- **Built-in JSON Filter** — shape your API payload visually. Select only the WooCommerce order fields your external system needs — no PHP, no expensive add-ons.
-- **Built-in API Logs** — see every request, response, HTTP status code, and latency right in your dashboard. Debug failed integrations in seconds.
+AnyAPI does one thing and does it precisely: it takes the order data WooCommerce already has, shapes it the way the receiving system expects, and delivers it the moment the order event fires — then shows you that it arrived.
 
-= WooCommerce Order Automation =
+* **Point it at a recipient and it runs** — set who should receive the order, and from then on every new order goes out on its own.
+* **One order, wherever it needs to go** — the same details can be sent to a REST API, a webhook, or an email address, so changing or adding a destination later isn't a rebuild.
+* **It leaves the moment the order does** — a new order, a payment, or a status you choose is enough to trigger it; you don't press anything.
+* **You can see it arrived** — every attempt is recorded with the response it got, shown in your dashboard, and a momentary failure on the other end is retried on its own.
 
-Trigger outgoing API calls automatically on any WooCommerce order event — new order, payment complete, order status change (processing, completed, refunded, and more). AnyAPI pushes your WooCommerce order data instantly to any REST API endpoint the moment an event fires.
+### Use Cases — What You Can Connect
 
-Configure multiple integrations, each with its own endpoint, authentication, and trigger rules. Enable or disable any integration with a single click.
+#### Send every order into a Google Sheet
 
-= REST API & Webhook Integration =
+Keeping a spreadsheet of your orders usually means exporting a CSV every few days, or copying orders across by hand — and it falls out of date the moment the next order arrives. AnyAPI adds each order to a Google Sheet as it happens, so the sheet keeps itself current. Every order becomes a new row you can sort, filter, or hand to someone who doesn't have access to WooCommerce — a bookkeeper, a supplier, a partner.
 
-AnyAPI connects your WooCommerce store to any external REST API that accepts standard HTTP requests. Send order data as JSON payloads via POST, PUT, or PATCH — with full control over headers, authentication, and request body.
+It works with a webhook and a short Google Apps Script, both covered step by step in the guide.
 
-Works with webhooks too. Point AnyAPI at any webhook URL — Slack Incoming Webhooks, Zapier Webhooks, Make (Integromat) Webhooks, or your own custom endpoint — and WooCommerce order data flows automatically.
+→ [Send WooCommerce orders to Google Sheets](https://anyapiplugin.com/woocommerce-google-sheets/?utm_source=starter&utm_medium=readme&utm_campaign=usecases)
 
-= JSON Payload Filtering =
+#### Tell your team the moment an order comes in
 
-The JSON Filter lets you choose exactly which WooCommerce order fields to include in your API request payload. Instead of sending the full order object (100+ fields), select only what your external system expects — customer name, email, order total, product SKU, shipping address, line items, and more.
+Nobody wants to sit watching the orders screen — but for a busy store, knowing an order landed the second it happens changes how fast you can act on it. AnyAPI posts each new order straight into a Slack channel, so the whole team sees it in the place they're already working. Order number, total, and the details that matter, dropped in as it happens — no one has to log in to WooCommerce to find out.
 
-Clean payloads mean fewer integration errors, faster debugging, and less data exposure. Most competing plugins either lack this feature entirely or gate it behind expensive paid add-ons.
+It works with a Slack incoming webhook, set up in a few minutes.
 
-= API Logs & Debugging =
+→ [Quick start: WooCommerce orders to Slack](https://anyapiplugin.com/docs/quick-start-slack-notification/?utm_source=starter&utm_medium=readme&utm_campaign=usecases)
 
-Every outgoing API call is logged automatically with full detail: HTTP status code (2xx, 4xx, 5xx), request payload, API response, latency, and timestamp. Search logs by order ID, endpoint URL, or filter by HTTP status to troubleshoot failed integrations fast.
+#### Email the order details automatically
 
-No more guessing whether your WooCommerce order data actually reached your external system. AnyAPI's API Logs give you complete visibility — included free, not locked behind a paywall.
+When an order reaches the status you choose, AnyAPI emails the full order details to whoever needs them — your fulfilment partner, your warehouse, your accountant, or your own inbox. Line items, quantities, totals, weight and dimensions are already laid out in the message, so the recipient can act on it without opening WooCommerce.
 
-= ERP, CRM & Fulfillment Connectivity =
+Choose the recipient, choose the order status, and it runs from the next order. No API, no setup research, and it works on the free version.
 
-Connect WooCommerce orders to enterprise systems without custom development. If your ERP, CRM, or fulfillment platform has a REST API, AnyAPI can push order data to it automatically.
+#### Get orders into the systems that run your business
 
-Common use cases include syncing WooCommerce orders to SAP, Oracle, NetSuite, Microsoft Dynamics, QuickBooks, Xero, ShipStation, Salesforce, HubSpot, Pipedrive, and custom in-house systems.
+The order doesn't stop being useful once it's in WooCommerce — your ERP still needs it for stock and invoicing, your CRM needs it against the customer's record, and your fulfilment provider needs it to ship. Normally that means someone re-entering the same order into each one. AnyAPI sends it to them directly, the moment the order is placed, so the systems you already run stay in step with your store without anyone keying orders in twice.
 
-= No-Code for Store Owners =
+If a system exposes a REST API or accepts a webhook, AnyAPI can reach it — whether it's a large platform or an in-house tool built just for your business.
 
-AnyAPI is designed so that WooCommerce store owners — not just developers — can set up API integrations in minutes. The visual interface guides you through endpoint configuration, authentication setup, trigger selection, and payload filtering. No PHP, no JavaScript, no terminal commands.
+#### Works with almost anything that has an API
 
-= WooCommerce REST API Development Tools =
+AnyAPI isn't tied to a fixed list of services. If a system has a REST API or accepts a webhook, your orders can reach it — accounting tools, CRMs, ERPs, messaging apps, shipping and courier services, or an internal system your team built in-house. You're not limited to a menu someone else decided on.
 
-AnyAPI includes a built-in REST API tester for WooCommerce. Perform GET, POST, PUT, PATCH, and DELETE operations on WooCommerce Orders, Products, and Customers directly inside your WordPress admin dashboard. Useful for developers building or debugging WooCommerce integrations.
+The same order can log itself to Google Sheets, post to Slack, or send a WhatsApp message through Woztell. It can also push order, inventory, and customer data into Oracle NetSuite, or adjust stock on a second WooCommerce store — from a simple spreadsheet log to a full ERP sync.
 
-= Works With Any REST API =
+### AnyAPI Lite: order integrations for WooCommerce
 
-AnyAPI connects WooCommerce to any REST API including:
+AnyAPI Lite builds on the free version with the controls a store needs once orders are flowing to real systems.
 
-- **Messaging & Notifications:** WhatsApp Business API, LINE Messaging API, Slack, Telegram, Discord, Microsoft Teams, Twilio
-- **CRM & Marketing:** HubSpot, Salesforce, Pipedrive, ActiveCampaign, Mailchimp, Klaviyo, Brevo, Kit (ConvertKit)
-- **ERP & Accounting:** SAP, Oracle NetSuite, Microsoft Dynamics, QuickBooks, Xero, Zoho Books
-- **Fulfillment & Shipping:** ShipStation, ShipBob, Shippo, custom 3PL systems
-- **Spreadsheets & Data:** Google Sheets (via Apps Script), Airtable, Notion
-- **Automation Platforms:** Zapier (via Webhooks), Make / Integromat, Pabbly Connect, n8n
-- **Custom Systems:** Any internal or third-party platform with a REST API endpoint
+**What it helps you tackle:**
 
-= Who Is AnyAPI For? =
+* Sending only the fields the receiving system expects, not the whole order.
+* Finding an order that failed days or weeks ago, instead of only seeing the latest calls.
+* Knowing how many of your integrations are succeeding.
+* Reaching more than one recipient, on more of your order events.
 
-- **WooCommerce store owners** who need order notifications sent to WhatsApp, LINE, Slack, or any messaging API — without hiring a developer
-- **Freelancers & agencies** managing multiple WooCommerce stores that need API integrations set up quickly and replicated across clients
-- **IT teams** connecting WooCommerce to ERP or fulfillment systems like SAP, NetSuite, or ShipStation — without writing custom PHP
-- **Anyone replacing Zapier or Make** for WooCommerce order workflows — AnyAPI runs inside WordPress with a simple annual fee, no per-task pricing
+**Lite highlights:**
 
-= Free vs. Pro =
-
-AnyAPI's free version on WordPress.org is fully functional — not a crippled demo. You get 1 API integration, 3 order triggers, unlimited API calls (throttled after 500/month), and real-time API Logs for your last 10 calls.
-
-**[AnyAPI Pro](https://anyapiplugin.com/pricing/?utm_source=starter&utm_medium=readme&utm_campaign=upgrade)** unlocks more API keys, all order triggers, JSON Filter, full API Log search and statistics, integration templates, and priority support. Plans start at $79/year — a fraction of what you'd pay for monthly SaaS automation tools.
-
-== Installation ==
-
-1. Upload the `anyapi` folder to `/wp-content/plugins/`, or install
-   directly from the WordPress plugin directory.
-2. Activate the plugin through the "Plugins" menu in WordPress.
-3. Go to **AnyAPI** in the WordPress admin sidebar.
-4. Add your first API Key (the credentials for your external API).
-5. Create an Order API integration — choose a trigger, set your
-   endpoint URL, and configure authentication.
-6. Place a test WooCommerce order. Check the API Logs to confirm
-   your data was sent successfully.
-
-That's it. Your WooCommerce orders are now connected to your
-external REST API — no code required.
+* **JSON Filter** — choose exactly which order fields to send, rename them, or set fixed values.
+* **Full order log** — keep every call you've ever made, and search your history by order ID, URL, or payload to open any call and see the exact data that was sent.
+* **More order triggers** — fire on more of WooCommerce's order events, not just the main three.
+* **Multiple email recipients** — send the same order to several addresses.
+* **Direct email support** — email help from Author.
 
 == Frequently Asked Questions ==
 
 = Is AnyAPI free to use? =
 
-Yes. The free version on WordPress.org includes 1 API integration, 3 order triggers, unlimited API calls (throttled after 500/month), and real-time API Logs for your last 10 calls. No credit card, no trial period.
+Yes. The free version on WordPress.org includes 1 API Key, the three main order triggers, unlimited API calls (throttled after 500/month), and a real-time API Log of your last 10 calls.
 
 = Do I need coding skills to use AnyAPI? =
 
-No. AnyAPI is designed to be fully no-code. You configure everything through a visual interface inside your WordPress admin — endpoints, authentication, triggers, and payload filtering. No PHP, no JavaScript, no command line.
+No. You configure everything through a visual interface inside your WordPress admin — endpoints, authentication, triggers, and payload filtering. No code at any point.
+
+= Can AnyAPI email order details automatically? =
+
+Yes. AnyAPI can email the full order details to any address the moment an order reaches the status you choose — useful for sending new orders to a fulfilment partner, a warehouse, or your own inbox. The recipient gets the order laid out and ready to act on, without logging into WooCommerce. This works on the free version.
+
+= Does the free version include ready-made templates? =
+
+Yes. The free version includes a ready-made Email template — pick who should receive the order, choose the trigger status, and it runs on the next matching order. There's nothing to design from scratch and no API to configure first.
 
 = Can I connect WooCommerce to any REST API? =
 
 Yes. If your external system has a REST API that accepts HTTP requests, AnyAPI can send WooCommerce order data to it. This includes ERPs, CRMs, messaging platforms, spreadsheets, fulfillment systems, and any custom API endpoint.
 
-= Does AnyAPI support webhooks? =
+= Can AnyAPI send data to a webhook URL? =
 
 Yes. AnyAPI can send WooCommerce order data to any webhook URL — including Slack Incoming Webhooks, Zapier Webhooks, Make Webhooks, and custom webhook endpoints. Configure the URL, authentication, and payload just like any other REST API integration.
 
 = How does AnyAPI automate WooCommerce orders? =
 
-AnyAPI automatically sends WooCommerce order data to any REST API when an order event is triggered — such as a new order, payment completion, or status change. No manual action needed; integrations fire automatically in the background.
+AnyAPI sends WooCommerce order data to your REST API when an order event fires — a new order, payment completion, or a status change you choose. No manual action needed; it runs in the background.
+
+= How is AnyAPI different from WooCommerce's built-in webhooks? =
+
+WooCommerce's built-in webhooks send the full order payload with no filtering, no visual configuration, and no logs. AnyAPI adds a no-code visual UI, JSON Filter to shape payloads, real-time API Logs for debugging, and authentication helpers — making integrations far easier to set up, monitor, and maintain.
 
 = What is the JSON Filter and why does it matter? =
 
@@ -133,11 +125,15 @@ The JSON Filter lets you choose exactly which WooCommerce order fields to send i
 
 = How do API Logs help me debug failed integrations? =
 
-Every API call is recorded in AnyAPI's API Logs with the HTTP status code, full request payload, API response, and latency. You can filter by status (2xx / 4xx / 5xx) and search by order ID or endpoint URL to identify exactly where and why an integration failed.
+Every API call is recorded in AnyAPI's API Log with its HTTP status code, the API response, and latency, so you can see whether each call went through and what came back. The free version keeps your last 10 calls. AnyAPI Lite keeps your full history and adds the full request payload, search by order ID, URL, or payload, and filtering by status (2xx / 4xx / 5xx).
+
+= What happens if the receiving API is temporarily down? =
+
+If the receiving service returns a temporary error — such as 429, 502, 503, or 504 — AnyAPI retries the call once on its own, following the service's Retry-After header where one is provided. That way a brief outage on the other end doesn't quietly cost you the order. The retry runs in the background and never blocks the order from being saved.
 
 = Does AnyAPI support WhatsApp Business API? =
 
-Yes. Configure AnyAPI to send a POST request to the WhatsApp Business API (via Meta's Cloud API or any gateway like Twilio or 360dialog) whenever a WooCommerce order is placed or updated.
+Yes. If you have access to the WhatsApp Business API — for example through a provider like Woztell — AnyAPI can send a POST request to it whenever a WooCommerce order is placed or updated.
 
 = Can I send WooCommerce orders to LINE Messaging API or Slack? =
 
@@ -151,36 +147,35 @@ Yes. If your ERP system (SAP, Oracle NetSuite, Microsoft Dynamics, or a custom E
 
 AnyAPI supports Basic Auth (username + password) and Bearer Token authentication. Compatible with any REST API that uses standard HTTP authentication methods.
 
-= How is AnyAPI different from WooCommerce's built-in webhooks? =
-
-WooCommerce's built-in webhooks send the full order payload with no filtering, no visual configuration, and no logs. AnyAPI adds a no-code visual UI, JSON Filter to shape payloads, real-time API Logs for debugging, and authentication helpers — making integrations far easier to set up, monitor, and maintain.
-
 = Is AnyAPI a Zapier or Make alternative for WooCommerce? =
 
-For WooCommerce order-to-API workflows, yes. AnyAPI runs entirely inside your WordPress installation with a simple annual fee — no per-task pricing, no external platform dependency, and your data stays on your server. For complex multi-step automations across many different plugins, tools like Zapier or Uncanny Automator may be more appropriate.
-
-= How is AnyAPI different from WPGetAPI? =
-
-WPGetAPI is a general-purpose WordPress-to-API connector. AnyAPI is purpose-built for WooCommerce order automation — with dedicated order triggers, a visual JSON Filter for order payloads, and built-in API Logs. If your primary need is pushing WooCommerce order data to external APIs, AnyAPI is designed specifically for that workflow.
-
-= What are the server requirements? =
-
-AnyAPI requires WordPress 6.2, WooCommerce 6.0+, and PHP 7.4+.
+For sending WooCommerce order data to external APIs, you can start on the free version. AnyAPI runs entirely inside your WordPress installation, with no per-task pricing, no external platform dependency, and your order data never leaves your server. It's built to do order-to-API automation well, rather than to be a general-purpose automation platform.
 
 == Screenshots ==
 
-1. **Order API Automation** — Configure WooCommerce order triggers and
-   connect to any REST API endpoint
-2. **Dashboard** — Overview of API activity, integration status, and
-   quick stats
-3. **Real-Time API Logs** — Monitor HTTP status codes, request payloads,
-   API responses, and latency for every outgoing call
-4. **JSON Filter** — Select exactly which WooCommerce order fields to
-   include in your API payload
-5. **API Status Toggle** — Enable or disable any integration with a
-   single click
+1. **Integration Templates** — Send order details by email in minutes, straight from a ready-made template
+2. **Google Sheets** — Log every WooCommerce order to a Google Sheet as it happens
+3. **Slack** — Post each new order straight into a Slack channel
+4. **Order API Automation** — Configure WooCommerce order triggers and connect to any REST API endpoint
+5. **Dashboard** — Overview of API activity, integration status, and quick stats
+6. **API Logs** — Search your full history, check success rates, and open any call to see the exact payload that was sent (AnyAPI Lite)
+7. **JSON Filter** — Select exactly which WooCommerce order fields to include in your API payload (AnyAPI Lite)
+8. **Dark mode** — The full AnyAPI admin in dark mode
 
 == Changelog ==
+
+= 2.0.5 (2026-08-22) =
+* Added    - Integration Templates: a new Templates page lets you open a prefilled setup wizard in one click. The Email template is ready to use on every plan.
+* Added    - Failed order integrations now retry automatically once after a temporary error (HTTP 429/502/503/504 or a connection failure), respecting Retry-After when the server sends it.
+* Added    - Order Integrations list now has an expandable row showing each integration's method, auth, full endpoint and filter, plus a Key column, creation time, and a label for integrations created from a template.
+* Added    - The API Key form now warns if you paste something that looks like a license key into the token field, and points you to the License page.
+* Improved - Clearer upgrade messaging across Order Integrations, API Keys, Integration Templates, the JSON Filter and the API Log.
+* Improved - New installs now see a "Set up your first integration" panel with a template shortcut when no integrations exist yet.
+* Improved - The branded header and the Plugin Info card (now showing AnyAPI Lite's version and update status) appear across all admin pages.
+* Changed  - Email destinations now use tokens ({{order_summary}}, {{order_id}}) in the message body. If you already have an email integration, add {{order_summary}} to its body to keep the order details — they are no longer added automatically.
+* Fixed    - Dark mode no longer flashes the light theme on load, and Dashboard and Templates page titles are now readable.
+* Fixed    - Expert-mode integrations no longer send an empty payload when an advanced filter fails to apply; those attempts are now logged as errors.
+* Fixed    - Corrected several admin links (API Keys page slug, documentation redirect loop, dead changelog link) and the plugins-list links.
 
 = 2.0.4 (2026-07-27) =
 * Added    - Email destination for order integrations: send order notifications by email (recipient, subject, intro message) with an automatic order summary including per-item weight and dimensions. {{order_id}} is supported in the To and Subject fields.
@@ -254,7 +249,24 @@ AnyAPI requires WordPress 6.2, WooCommerce 6.0+, and PHP 7.4+.
 = 1.0.0 (2025-05-27) =
 * Initial release
 
-== Source Code ==
+== Installation ==
 
-The source code for AnyAPI is available on GitHub:
-https://github.com/Joecyc/anyapi
+Requires WooCommerce 6.0 or higher.
+
+**Setup**
+
+1. Upload the `anyapi` folder to `/wp-content/plugins/`, or install directly from the WordPress plugin directory.
+2. Activate the plugin through the "Plugins" menu in WordPress.
+3. Go to **AnyAPI** in the WordPress admin sidebar.
+
+**Fastest start — the Email template**
+
+1. Open the Templates page and choose the Email template.
+2. Enter who should receive the order and pick the trigger status.
+3. Place a test WooCommerce order, then check the API Log to confirm it was sent.
+
+**Sending to a REST API or webhook instead**
+
+1. Add an API Key (the credentials for your external API).
+2. Create an Order API integration — choose a trigger, set your endpoint URL, and configure authentication.
+3. Place a test order and check the API Log to confirm your data arrived.

@@ -9,6 +9,10 @@
 
 namespace Anyapi;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( class_exists( __NAMESPACE__ . '\\PlanHelper' ) ) {
 	return; // Lite's full version already loaded — skip stub
 }

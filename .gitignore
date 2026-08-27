@@ -32,14 +32,9 @@ yarn.lock
 gulpfile.js
 
 # Others #
+assets
 legacy
 temp
 .prettierignore
 doc/plugin-structure.md
-
-# Security #
-.env
-.env.*
-*.key
-*.pem
-*token*
+.claude/

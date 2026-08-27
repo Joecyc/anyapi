@@ -940,14 +940,16 @@ select.widefat:focus {
    Locked state — tiles and mode buttons
    -------------------------------------------------------------------------- */
 .action-tile.is-locked,
-.filter-mode-btn.is-locked {
+.filter-mode-btn.is-locked,
+.dest-btn.is-locked {
   opacity: 0.55;
   cursor: not-allowed;
   position: relative;
 }
 
 .action-tile.is-locked:hover,
-.filter-mode-btn.is-locked:hover {
+.filter-mode-btn.is-locked:hover,
+.dest-btn.is-locked:hover {
   transform: none;
   box-shadow: none;
   border-color: var(--anyapi-border);
@@ -1315,6 +1317,12 @@ select.widefat:focus {
   font-size: 15px;
   color: var(--anyapi-text-muted);
   margin: 0 0 28px;
+  white-space: pre-line;
+}
+
+.upgrade-modal__primary {
+  text-align: center;
+  margin: 0 0 28px;
 }
 
 /* Plan comparison in modal */
@@ -1464,6 +1472,11 @@ select.widefat:focus {
   color: var(--anyapi-text-muted);
   margin: 0;
 }
+.order-page-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
 .oi-table {
   width: 100%;
@@ -1503,6 +1516,11 @@ select.widefat:focus {
   opacity: 0.5;
 }
 
+.oi-col-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .oi-col-name strong {
   display: block;
   font-weight: 700;
@@ -1514,6 +1532,117 @@ select.widefat:focus {
   color: var(--anyapi-text-muted);
   margin-top: 2px;
 }
+.oi-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  border: 1px solid rgba(93, 95, 239, 0.22);
+  border-radius: 20px;
+  padding: 1px 8px;
+  width: fit-content;
+}
+
+/* --------------------------------------------------------------------------
+   Expandable detail row
+   -------------------------------------------------------------------------- */
+.oi-expand-btn {
+  background: transparent;
+  border: 1.5px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  color: var(--anyapi-text-muted);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+  line-height: 1;
+  transition: all 0.15s;
+}
+.oi-expand-btn:hover {
+  border-color: rgba(93, 95, 239, 0.22);
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+}
+
+.oi-detail-row {
+  display: none;
+}
+.oi-detail-row.is-open {
+  display: table-row;
+}
+.oi-detail-cell {
+  background: var(--anyapi-bg);
+  padding: 18px 20px !important;
+}
+
+.oi-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+}
+.oi-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.oi-detail-full {
+  grid-column: 1 / -1;
+}
+.oi-detail-item__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--anyapi-text-muted);
+}
+.oi-detail-item__value {
+  font-size: 13px;
+  color: var(--anyapi-text);
+  word-break: break-word;
+}
+.oi-detail-item pre {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--anyapi-card);
+  border: 1px solid var(--anyapi-border);
+  border-radius: var(--anyapi-radius-sm);
+  font-size: 12px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--anyapi-text);
+}
+
+.oi-method-inline {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--anyapi-primary);
+  background: rgba(93, 95, 239, 0.08);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-right: 6px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.oi-field-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.oi-field-chip {
+  font-size: 11px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  color: var(--anyapi-text);
+  background: var(--anyapi-card);
+  border: 1px solid var(--anyapi-border);
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
 .oi-col-url code {
   font-size: 11px;
   font-family: monospace;
@@ -1917,14 +2046,16 @@ select.widefat:focus {
 
 /* locked tiles */
 .dark-mode .action-tile.is-locked,
-.dark-mode .filter-mode-btn.is-locked {
+.dark-mode .filter-mode-btn.is-locked,
+.dark-mode .dest-btn.is-locked {
   background: var(--anyapi-bg2);
   border-color: var(--anyapi-border);
   opacity: 0.55;
 }
 
 .dark-mode .action-tile.is-locked:hover,
-.dark-mode .filter-mode-btn.is-locked:hover {
+.dark-mode .filter-mode-btn.is-locked:hover,
+.dark-mode .dest-btn.is-locked:hover {
   background: var(--anyapi-bg2);
   border-color: var(--anyapi-border);
   box-shadow: none;
@@ -2105,6 +2236,45 @@ select.widefat:focus {
   background: rgba(129, 140, 248, 0.1);
   color: var(--anyapi-primary);
   border-color: rgba(129, 140, 248, 0.22);
+}
+
+/* ── OI source badge + expand row ───────────────────────────────────────── */
+.dark-mode .oi-source-badge {
+  background: rgba(129, 140, 248, 0.1);
+  color: var(--anyapi-primary);
+  border-color: rgba(129, 140, 248, 0.22);
+}
+.dark-mode .oi-expand-btn {
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .oi-expand-btn:hover {
+  border-color: rgba(129, 140, 248, 0.35);
+  color: var(--anyapi-primary);
+  background: rgba(129, 140, 248, 0.07);
+}
+.dark-mode .oi-detail-cell {
+  background: var(--anyapi-bg2);
+}
+.dark-mode .oi-detail-item__label {
+  color: var(--anyapi-text-muted);
+}
+.dark-mode .oi-detail-item__value {
+  color: var(--anyapi-text);
+}
+.dark-mode .oi-detail-item pre {
+  background: var(--anyapi-card);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text);
+}
+.dark-mode .oi-method-inline {
+  background: rgba(129, 140, 248, 0.1);
+  color: var(--anyapi-primary);
+}
+.dark-mode .oi-field-chip {
+  background: var(--anyapi-card2);
+  border-color: var(--anyapi-border);
+  color: var(--anyapi-text);
 }
 
 /* ── OI toggle (status in table) ────────────────────────────────────────── */

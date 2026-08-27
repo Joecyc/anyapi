@@ -6,6 +6,8 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+( new \Anyapi\Views\Dashboard() )->brandHeader();
+
 // ── Plan data ─────────────────────────────────────────────────────────────
 $plan         = \Anyapi\PlanHelper::currentPlan();
 $limits       = \Anyapi\PlanHelper::currentLimits();
@@ -33,6 +35,25 @@ $latest_info  = \Anyapi\Admin::getLatestVersion();
 $has_update   = $latest_info && version_compare( $current_ver, $latest_info['version'], '<' );
 $update_url   = \Anyapi\Admin::pluginUpdateUrl();
 
+// ── Lite version (if active) ──────────────────────────────────────────────
+$lite_active = defined( 'ANYAPI_LITE_VERSION' ) && defined( 'ANYAPI_LITE_SLUG' );
+if ( $lite_active ) {
+  $lite_plugin_file = ANYAPI_LITE_SLUG . '/' . ANYAPI_LITE_SLUG . '.php';
+  $lite_ver         = ANYAPI_LITE_VERSION;
+  $lite_transient   = get_site_transient( 'update_plugins' );
+  $lite_checked     = is_object( $lite_transient );
+  $lite_update_obj  = ( $lite_checked && isset( $lite_transient->response[ $lite_plugin_file ] ) )
+                       ? $lite_transient->response[ $lite_plugin_file ] : null;
+  $lite_has_update  = (bool) $lite_update_obj;
+  $lite_latest_ver  = $lite_has_update ? $lite_update_obj->new_version : $lite_ver;
+  $lite_update_url  = $lite_has_update
+                       ? wp_nonce_url(
+                           self_admin_url( 'update.php?action=upgrade-plugin&plugin=' . rawurlencode( $lite_plugin_file ) ),
+                           'upgrade-plugin_' . $lite_plugin_file
+                         )
+                       : '';
+}
+
 // ── Pro expiry (stored by Pro plugin, optional) ───────────────────────────
 $pro_expiry   = get_option( 'anyapi_pro_expiry', '' );  // 'YYYY-MM-DD' or ''
 
@@ -48,6 +69,13 @@ $features = array(
     'desc'   => __( 'Connect WooCommerce orders to any REST API', 'anyapi' ),
     'plans'  => array( 'starter', 'lite', 'plus', 'agency' ),
     'note'   => '',
+  ),
+  array(
+    'icon'   => '✉️',
+    'label'  => __( 'Email Destinations', 'anyapi' ),
+    'desc'   => __( 'Send order details directly to an email address', 'anyapi' ),
+    'plans'  => array( 'starter', 'lite', 'plus', 'agency' ),
+    'note'   => __( 'Starter: 1 · Lite: 3 · Plus/Agency: Unlimited', 'anyapi' ),
   ),
   array(
     'icon'   => '⚡',
@@ -98,21 +126,21 @@ $features = array(
     'plans'  => array( 'lite', 'plus', 'agency' ),
     'note'   => '',
   ),
-  // pre-release
-  // array(
-  //   'icon'   => '📦',
-  //   'label'  => __( 'Integration Templates', 'anyapi' ),
-  //   'desc'   => __( 'Pre-built templates for popular services', 'anyapi' ),
-  //   'plans'  => array( 'lite', 'plus', 'agency' ),
-  //   'note'   => __( 'Lite: 3 · Plus & Agency: All', 'anyapi' ),
-  // ),
   array(
-    'icon'   => '📥',
-    'label'  => __( 'Webhook Receiver', 'anyapi' ),
-    'desc'   => __( 'Receive inbound webhooks from external APIs', 'anyapi' ),
-    'plans'  => array( 'plus', 'agency' ),
-    'note'   => __( 'Plus & Agency only', 'anyapi' ),
+    'icon'   => '📦',
+    'label'  => __( 'Integration Templates', 'anyapi' ),
+    'desc'   => __( 'One-click prefilled integrations for popular services', 'anyapi' ),
+    'plans'  => array( 'starter', 'lite', 'plus', 'agency' ),
+    'note'   => __( 'Starter: 1 (Email)', 'anyapi' ),
   ),
+  // not yet built — hidden until webhook inbound ships
+  // array(
+  //   'icon'   => '📥',
+  //   'label'  => __( 'Webhook Receiver', 'anyapi' ),
+  //   'desc'   => __( 'Receive inbound webhooks from external APIs', 'anyapi' ),
+  //   'plans'  => array( 'plus', 'agency' ),
+  //   'note'   => __( 'Plus & Agency only', 'anyapi' ),
+  // ),
 );
 ?>
 
@@ -279,7 +307,7 @@ $features = array(
             </div>
             <?php endif; ?>
             <p class="st-meter__hint">
-              <a href="<?php echo esc_url( admin_url( 'admin.php?page=anyapi-apikey' ) ); ?>">
+              <a href="<?php echo esc_url( admin_url( 'admin.php?page=anyapi_apikey' ) ); ?>">
                 <?php esc_html_e( 'Manage API Keys →', 'anyapi' ); ?>
               </a>
             </p>
@@ -383,6 +411,41 @@ $features = array(
             <span class="st-info-row__value st-mono"><?php echo esc_html( ANYAPI_RELEASE_DATE ); ?></span>
           </div>
 
+          <?php if ( $lite_active ) : ?>
+          <div class="st-info-row" style="border-top:1px solid var(--anyapi-border);margin-top:14px;padding-top:14px;">
+            <span class="st-info-row__label"><?php esc_html_e( 'Lite Version', 'anyapi' ); ?></span>
+            <span class="st-info-row__value st-mono"><?php echo esc_html( $lite_ver ); ?></span>
+          </div>
+          <div class="st-info-row">
+            <span class="st-info-row__label"><?php esc_html_e( 'Lite Status', 'anyapi' ); ?></span>
+            <span class="st-info-row__value">
+              <?php if ( $lite_has_update ) : ?>
+                <span class="st-badge st-badge--warn">
+                  <?php
+                  // translators: %s is the new AnyAPI Lite version number e.g. 1.4.0
+                  printf( esc_html__( 'v%s available', 'anyapi' ), esc_html( $lite_latest_ver ) ); ?>
+                </span>
+              <?php elseif ( $lite_checked ) : ?>
+                <span class="st-badge st-badge--ok"><?php esc_html_e( 'Up to date', 'anyapi' ); ?></span>
+              <?php else : ?>
+                <span class="st-badge st-badge--muted"><?php esc_html_e( 'Unknown', 'anyapi' ); ?></span>
+              <?php endif; ?>
+            </span>
+          </div>
+          <?php if ( $lite_has_update ) : ?>
+          <div class="st-update-box">
+            <p class="st-update-box__title">
+              🆕 <?php
+              // translators: %s is the new AnyAPI Lite version number e.g. 1.4.0
+              printf( esc_html__( 'AnyAPI Lite %s is available', 'anyapi' ), esc_html( $lite_latest_ver ) ); ?>
+            </p>
+            <a href="<?php echo esc_url( $lite_update_url ); ?>" class="st-btn st-btn--primary st-btn--sm">
+              ⬆ <?php esc_html_e( 'Update Now', 'anyapi' ); ?>
+            </a>
+          </div>
+          <?php endif; ?>
+          <?php endif; ?>
+
           <div class="st-info-links">
             <a href="<?php echo esc_url( anyapi_utm_url( 'https://anyapiplugin.com/documentation', 'settings', 'docs' ) ); ?>" target="_blank" rel="noopener">📖 Docs</a>
             <a href="https://wordpress.org/support/plugin/anyapi/" target="_blank" rel="noopener">💬 Support</a>
@@ -457,6 +520,7 @@ $features = array(
         <div class="st-card__body st-card__body--flush">
           <?php
           $nav_links = array(
+            array( 'icon' => '🧩', 'label' => __( 'Templates', 'anyapi' ),          'url' => admin_url( 'admin.php?page=anyapi_templates' ) ),
             array( 'icon' => '🔗', 'label' => __( 'Order Integrations', 'anyapi' ), 'url' => admin_url( 'admin.php?page=anyapi_orderapi' ) ),
             array( 'icon' => '🔑', 'label' => __( 'API Keys', 'anyapi' ),           'url' => admin_url( 'admin.php?page=anyapi_apikey' ) ),
             array( 'icon' => '🧪', 'label' => __( 'REST API Tester', 'anyapi' ),    'url' => admin_url( 'admin.php?page=anyapi_restapi' ) ),

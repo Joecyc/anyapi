@@ -1569,6 +1569,12 @@
   }
 }
 
+.anyapi-brand-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
 /* Legacy logo img (kept for backward compat) */
 .anyapi-logo {
   height: 40px;
@@ -1681,8 +1687,13 @@
    Dark Mode Overrides  [v2 — CSS variables handle most cases]
    Only overrides that can't be expressed as CSS variables
    ============================================================ */
-.dark-mode {
+.dark-mode,
+.dark-mode body {
   background: var(--anyapi-bg);
+  color: var(--anyapi-text);
+}
+
+.dark-mode .anyapi-dash-topbar h1 {
   color: var(--anyapi-text);
 }
 

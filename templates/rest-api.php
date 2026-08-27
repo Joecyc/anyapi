@@ -6,6 +6,8 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+( new \Anyapi\Views\Dashboard() )->brandHeader();
+
 // ── Saved API Keys (for auth selector) ───────────────────────────────────────
 $keys = get_option( 'anyapi_wc_apikey', array() );
 $active_keys = array_filter( $keys, fn( $k ) => ( $k['status'] ?? 'active' ) === 'active' );
@@ -122,7 +124,7 @@ $wc_endpoints = array(
             <?php if ( empty( $active_keys ) ) : ?>
               <p class="rt-hint rt-hint--warn">
                 ⚠️ <?php esc_html_e( 'No active API Keys found.', 'anyapi' ); ?>
-                <a href="<?php echo esc_url( admin_url( 'admin.php?page=anyapi-apikey' ) ); ?>">
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=anyapi_apikey' ) ); ?>">
                   <?php esc_html_e( 'Add one →', 'anyapi' ); ?>
                 </a>
               </p>

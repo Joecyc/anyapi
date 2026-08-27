@@ -101,6 +101,16 @@ class Anyapi {
 
     // ── Feature pages ────────────────────────────────────────────────────
 
+    // Integration Templates (one-click presets)
+    $this->subpages[] = array(
+      'parent_slug' => self::MENU_SLUG,
+      'page_title'  => 'AnyAPI - Integration Templates',
+      'menu_title'  => 'Templates',
+      'capability'  => 'manage_options',
+      'menu_slug'   => self::MENU_SLUG . '_templates',
+      'callback'    => array( $this->settings, 'pageTemplates' ),
+    );
+
     $this->subpages[] = array(
       'parent_slug' => self::MENU_SLUG,
       'page_title'  => 'AnyAPI - Order API Integration',

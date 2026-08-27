@@ -25,6 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
     filterMode: "basic",
     selectedFields: [],
     searchQuery: "",
+
+    fromTemplate: false,
+    templateId: "",
   };
 
   // ===========================================================================
@@ -194,8 +197,58 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.querySelectorAll(".dest-btn").forEach((btn) => {
-    btn.addEventListener("click", () => applyDestinationUI(btn.dataset.dest));
+    btn.addEventListener("click", function () {
+      if (this.dataset.locked === "1") {
+        openUpgradeModal(cfg.i18n?.email_dest_locked, {
+          label: cfg.i18n?.go_to_templates,
+          url: cfg.templatesUrl,
+          title: cfg.i18n?.email_dest_title,
+        });
+        return;
+      }
+      applyDestinationUI(this.dataset.dest);
+    });
   });
+
+  // ===========================================================================
+  // Step 1 context (generic vs template) UI toggle
+  // ===========================================================================
+
+  function applyContextUI(isTemplate) {
+    document
+      .querySelectorAll(".js-generic-ctx")
+      .forEach((el) => (el.hidden = isTemplate));
+    document
+      .querySelectorAll(".js-template-ctx")
+      .forEach((el) => (el.hidden = !isTemplate));
+    document.querySelectorAll("[data-ph-generic]").forEach((inp) => {
+      const ph = isTemplate ? inp.dataset.phTemplate : inp.dataset.phGeneric;
+      if (ph != null) inp.placeholder = ph;
+    });
+  }
+
+  // ===========================================================================
+  // Template preset variant (Default / Custom)
+  // ===========================================================================
+
+  function applyVariant(variant) {
+    const preset = (window.anyapiTplPresets || {})[state.templateId]?.[variant];
+    if (!preset) return;
+    const nameEl = document.getElementById("integration-name");
+    const subjectEl = document.getElementById("email-subject");
+    const preambleEl = document.getElementById("email-preamble");
+    if (nameEl) nameEl.value = preset.name || "";
+    if (subjectEl) subjectEl.value = preset.subject || "";
+    if (preambleEl) preambleEl.value = preset.preamble || "";
+    document
+      .querySelectorAll(".action-tile")
+      .forEach((t) =>
+        t.classList.toggle(
+          "active",
+          t.dataset.action === (preset.trigger || ""),
+        ),
+      );
+  }
 
   // ===========================================================================
   // Wizard open / close
@@ -233,6 +286,8 @@ document.addEventListener("DOMContentLoaded", function () {
     state.filterMode = "basic";
     state.selectedFields = [];
     state.searchQuery = "";
+    state.fromTemplate = false;
+    state.templateId = "";
 
     // Clear inputs
     [
@@ -248,6 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     applyDestinationUI("url");
+    applyContextUI(false);
 
     const keySelect = document.getElementById("api-key-select");
     if (keySelect) keySelect.value = "";
@@ -354,6 +410,26 @@ document.addEventListener("DOMContentLoaded", function () {
     if (emailToEl) emailToEl.value = record.email_to || "";
     if (emailSubjectEl) emailSubjectEl.value = record.email_subject || "";
     if (emailPreambleEl) emailPreambleEl.value = record.email_preamble || "";
+  }
+
+  /**
+   * Apply a template preset to a fresh "new integration" wizard.
+   * Presets come from window.anyapiTplPresets (localized; UNLOCKED templates only,
+   * so a tampered ?anyapi_tpl=<locked> URL is a safe no-op).
+   */
+  function applyTemplatePreset(tplId, variant) {
+    const preset = (window.anyapiTplPresets || {})[tplId]?.[
+      variant || "default"
+    ];
+    if (!preset) return; // unknown or locked template → no-op
+
+    openWizard(0); // fresh new-integration wizard (resetWizard runs inside), then override:
+    state.fromTemplate = true;
+    state.templateId = tplId;
+    applyContextUI(true);
+    applyDestinationUI(preset.destination || "email");
+    applyVariant(variant || "default");
+    // Recipient (#email-to) intentionally left blank — user enters their recipient.
   }
 
   // ===========================================================================
@@ -924,6 +1000,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return k ? k.name : akId;
   }
 
+  function getKeyType(akId) {
+    if (!akId || !cfg.api_keys) return "";
+    return cfg.api_keys.find((k) => k.id === akId)?.type || "";
+  }
+
   // ===========================================================================
   // Save (Finish button)
   // ===========================================================================
@@ -967,6 +1048,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "email_preamble",
       document.getElementById("email-preamble")?.value || "",
     );
+    fd.append("created_via", state.fromTemplate ? "template" : "manual");
 
     try {
       const res = await fetch(cfg.ajax_url, { method: "POST", body: fd });
@@ -980,7 +1062,13 @@ document.addEventListener("DOMContentLoaded", function () {
           "success",
           cfg.i18n?.save_success || "Integration saved!",
         );
-        setTimeout(() => closeWizard(), 1800);
+        setTimeout(() => {
+          if (state.fromTemplate && cfg.order_api_url) {
+            window.location.href = cfg.order_api_url;
+          } else {
+            closeWizard();
+          }
+        }, 1800);
       } else {
         if (data.data?.gate) {
           openUpgradeModal(data.data.message);
@@ -1037,12 +1125,39 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Edit button
+  // Edit button (main row, Actions column)
   tbody?.addEventListener("click", function (e) {
     const editBtn = e.target.closest(".js-edit-integration");
     if (editBtn) {
       openWizard(parseInt(editBtn.dataset.id));
     }
+  });
+
+  // Expand / collapse detail row
+  tbody?.addEventListener("click", function (e) {
+    const expandBtn = e.target.closest(".js-expand-row");
+    if (!expandBtn) return;
+
+    const id = expandBtn.dataset.id;
+    const detailRow = document.getElementById(`oi-detail-${id}`);
+    const expanded = expandBtn.getAttribute("aria-expanded") === "true";
+
+    // Collapse all others
+    tbody
+      .querySelectorAll('.js-expand-row[aria-expanded="true"]')
+      .forEach((btn) => {
+        if (btn !== expandBtn) {
+          btn.setAttribute("aria-expanded", "false");
+          btn.textContent = "▶";
+          document
+            .getElementById(`oi-detail-${btn.dataset.id}`)
+            ?.classList.remove("is-open");
+        }
+      });
+
+    expandBtn.setAttribute("aria-expanded", expanded ? "false" : "true");
+    expandBtn.textContent = expanded ? "▶" : "▼";
+    detailRow?.classList.toggle("is-open", !expanded);
   });
 
   // Delete button
@@ -1080,8 +1195,12 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   function upsertRow(record) {
     const existing = tbody?.querySelector(`tr[data-id="${record.id}"]`);
+    const existingDetail = document.getElementById(`oi-detail-${record.id}`);
     const keyName = getKeyName(record.api_key_id);
+    const keyType = getKeyType(record.api_key_id);
     const isActive = record.status === "active";
+    const isEmail = record.destination_type === "email";
+    const filterMode = record.filter_mode || "basic";
 
     const tr = document.createElement("tr");
     tr.dataset.id = record.id;
@@ -1089,15 +1208,16 @@ document.addEventListener("DOMContentLoaded", function () {
     tr.innerHTML = `
       <td class="oi-col-name">
         <strong>${escHtml(record.name || "Integration #" + record.id)}</strong>
-        ${keyName ? `<span class="oi-key-badge">🔑 ${escHtml(keyName)}</span>` : ""}
+        ${record.created_via === "template" ? `<span class="oi-source-badge">🧩 ${cfg.i18n?.badge_template || "Template"}</span>` : ""}
       </td>
       <td>${escHtml(record.trigger)}</td>
+      <td>${keyName ? `<span class="oi-key-badge">🔑 ${escHtml(keyName)}</span>` : "—"}</td>
       <td class="oi-col-url">${
-        record.destination_type === "email"
+        isEmail
           ? `✉️ ${escHtml(record.email_to || "")}`
           : `<code title="${escHtml(record.api_url)}">${escHtml(record.api_url.length > 40 ? record.api_url.slice(0, 40) + "…" : record.api_url)}</code>`
       }</td>
-      <td>${escHtml(record.filter_mode.charAt(0).toUpperCase() + record.filter_mode.slice(1))}</td>
+      <td>${escHtml(filterMode.charAt(0).toUpperCase() + filterMode.slice(1))}</td>
       <td>
         <label class="oi-toggle">
           <input type="checkbox" class="oi-toggle__input js-toggle-integration" data-id="${record.id}" ${isActive ? "checked" : ""}>
@@ -1105,14 +1225,28 @@ document.addEventListener("DOMContentLoaded", function () {
         </label>
       </td>
       <td class="oi-col-actions">
-        <button type="button" class="oi-btn oi-btn--sm oi-btn--ghost js-edit-integration" data-id="${record.id}">✏️ Edit</button>
+        <button type="button" class="oi-btn oi-btn--sm oi-btn--ghost js-edit-integration" data-id="${record.id}">✏️</button>
         <button type="button" class="oi-btn oi-btn--sm oi-btn--danger-ghost js-delete-integration" data-id="${record.id}">🗑</button>
+        <button type="button" class="oi-expand-btn js-expand-row" data-id="${record.id}" aria-expanded="false">▶</button>
       </td>`;
+
+    const detailTr = document.createElement("tr");
+    detailTr.className = "oi-detail-row";
+    detailTr.id = `oi-detail-${record.id}`;
+    detailTr.innerHTML = buildDetailRowHtml(record, {
+      isEmail,
+      filterMode,
+      keyName,
+      keyType,
+    });
 
     if (existing) {
       existing.replaceWith(tr);
+      if (existingDetail) existingDetail.replaceWith(detailTr);
+      else tr.after(detailTr);
     } else {
       tbody?.appendChild(tr);
+      tbody?.appendChild(detailTr);
     }
 
     // Show table, hide empty state
@@ -1120,8 +1254,76 @@ document.addEventListener("DOMContentLoaded", function () {
     emptyState?.classList.add("is-hidden");
   }
 
+  function buildDetailRowHtml(
+    record,
+    { isEmail, filterMode, keyName, keyType },
+  ) {
+    const methodAuth = isEmail
+      ? "✉️ Email delivery (no HTTP method, no auth)"
+      : `<span class="oi-method-inline">${escHtml(record.http_method || "POST")}</span> ${
+          keyName
+            ? `${escHtml(keyName)} (${escHtml(keyType)})`
+            : "No authentication"
+        }`;
+
+    let filterContent = "";
+    if (filterMode === "basic") {
+      filterContent = record.payload
+        ? `<pre>${escHtml(record.payload)}</pre>`
+        : `<span class="oi-detail-item__value">No custom payload — the full WooCommerce order data is sent.</span>`;
+    } else if (filterMode === "advanced") {
+      filterContent = `<div class="oi-field-list">${(
+        record.selected_fields || []
+      )
+        .map((f) => `<span class="oi-field-chip">${escHtml(f)}</span>`)
+        .join("")}</div>`;
+    } else if (filterMode === "expert") {
+      filterContent = `<pre>${escHtml(record.raw_json_override || "")}</pre>`;
+    }
+
+    const destinationDetail = isEmail
+      ? `
+        <div class="oi-detail-item">
+          <span class="oi-detail-item__label">Subject</span>
+          <span class="oi-detail-item__value">${escHtml(record.email_subject || "")}</span>
+        </div>
+        <div class="oi-detail-item">
+          <span class="oi-detail-item__label">Intro</span>
+          <span class="oi-detail-item__value">${escHtml(record.email_preamble || "")}</span>
+        </div>`
+      : `
+        <div class="oi-detail-item oi-detail-full">
+          <span class="oi-detail-item__label">Full endpoint</span>
+          <span class="oi-detail-item__value">${escHtml(record.api_url || "")}</span>
+        </div>`;
+
+    return `
+      <td class="oi-detail-cell" colspan="7">
+        <div class="oi-detail-grid">
+          <div class="oi-detail-item">
+            <span class="oi-detail-item__label">Trigger</span>
+            <span class="oi-detail-item__value">${escHtml(record.trigger)}</span>
+          </div>
+          <div class="oi-detail-item">
+            <span class="oi-detail-item__label">Method / Authentication</span>
+            <span class="oi-detail-item__value">${methodAuth}</span>
+          </div>
+          <div class="oi-detail-item">
+            <span class="oi-detail-item__label">Created</span>
+            <span class="oi-detail-item__value">${escHtml(formatCreatedAt(record.created_at))}</span>
+          </div>
+          ${destinationDetail}
+          <div class="oi-detail-item oi-detail-full">
+            <span class="oi-detail-item__label">Filter content</span>
+            ${filterContent}
+          </div>
+        </div>
+      </td>`;
+  }
+
   function removeRow(id) {
     tbody?.querySelector(`tr[data-id="${id}"]`)?.remove();
+    document.getElementById(`oi-detail-${id}`)?.remove();
     if (tbody && tbody.rows.length === 0) {
       listWrap?.classList.add("is-hidden");
       emptyState?.classList.remove("is-hidden");
@@ -1136,6 +1338,17 @@ document.addEventListener("DOMContentLoaded", function () {
       .replace(/"/g, "&quot;");
   }
 
+  // Formats a MySQL "Y-m-d H:i:s" timestamp (site local time) into a readable string.
+  function formatCreatedAt(mysqlDate) {
+    if (!mysqlDate) return "—";
+    const d = new Date(mysqlDate.replace(" ", "T"));
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  }
+
   // ===========================================================================
   // Upgrade Modal
   // ===========================================================================
@@ -1145,9 +1358,28 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalCloseBtn = upgradeModal?.querySelector(".upgrade-modal__close");
   const modalBackdrop = upgradeModal?.querySelector(".upgrade-modal__backdrop");
 
-  function openUpgradeModal(reason) {
+  function openUpgradeModal(reason, primary) {
     if (!upgradeModal) return;
     if (modalBody) modalBody.textContent = reason || "";
+
+    const titleEl = document.getElementById("modal-title");
+    const primaryWrap = document.getElementById("modal-primary-action");
+    const primaryLink = document.getElementById("modal-primary-link");
+
+    if (titleEl) {
+      titleEl.textContent =
+        primary?.title || titleEl.dataset.defaultTitle || titleEl.textContent;
+    }
+    if (primaryWrap && primaryLink) {
+      if (primary?.url) {
+        primaryLink.href = primary.url;
+        primaryLink.textContent = primary.label || "Continue";
+        primaryWrap.hidden = false;
+      } else {
+        primaryWrap.hidden = true;
+      }
+    }
+
     upgradeModal.style.display = "flex";
     document.body.style.overflow = "hidden";
     setTimeout(() => modalCloseBtn?.focus(), 50);
@@ -1174,4 +1406,10 @@ document.addEventListener("DOMContentLoaded", function () {
   renderSelectedFields();
   updateJsonPreview();
   switchStep(1);
+
+  // F-11: template prefill handoff from the Templates page (same-page wizard).
+  document.addEventListener("anyapi:open-template", function (e) {
+    if (!e.detail) return;
+    applyTemplatePreset(e.detail.tplId, e.detail.variant || "default");
+  });
 });

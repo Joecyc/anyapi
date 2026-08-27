@@ -5,7 +5,7 @@
 [![Tested up to](https://img.shields.io/wordpress/plugin/tested/anyapi)](https://wordpress.org/plugins/anyapi/)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPLv2%2B-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 
-Send WooCommerce orders to any REST API or webhook automatically — no code required. Built-in JSON payload filtering and real-time API logs.
+Send WooCommerce order details anywhere — a REST API, a webhook, or email — automatically. No code, every call logged. Start from a ready-made template.
 
 🔗 [Website](https://anyapiplugin.com) · 📖 [Documentation](https://anyapiplugin.com/documentation/) · 🧩 [WordPress.org](https://wordpress.org/plugins/anyapi/) · 💬 [Support](https://wordpress.org/support/plugin/anyapi/)
 
@@ -13,7 +13,7 @@ Send WooCommerce orders to any REST API or webhook automatically — no code req
 
 ## Overview
 
-When an order event fires in WooCommerce — a new order, a payment completion, or a status change — AnyAPI sends the order data to any external REST API endpoint you configure: ERP, CRM, fulfillment, accounting, or a messaging service. Everything is set up through the WordPress admin UI; no PHP and no external SaaS required.
+When an order event fires in WooCommerce — a new order, a payment completion, or a status change — AnyAPI sends the order data where it needs to go — a REST API, a webhook, or an email address: ERP, CRM, fulfillment, accounting, a courier, or your own inbox. Start from a ready-made Email template, or configure a custom integration. Everything is set up through the WordPress admin UI; no PHP and no external SaaS required.
 
 ## Features
 
@@ -24,6 +24,9 @@ When an order event fires in WooCommerce — a new order, a payment completion, 
 - **Real-time API Logs** — HTTP status code, request payload, response, and latency for every call; searchable by order ID, endpoint, or status
 - **Built-in WooCommerce REST API tester** — GET / POST / PUT / PATCH / DELETE on Orders, Products, and Customers
 - **Multiple stored credentials** — referenced centrally by ID
+- **Integration Templates** — start from a ready-made Email template: pick the recipient and trigger, and it runs on the next order
+- **Email delivery** — email full order details (line items, totals, weight, dimensions) to a fulfilment partner, warehouse, or your own inbox when an order reaches the status you choose
+- **Automatic retry** — a transient failure on the receiving end (HTTP 429/502/503/504 or a connection error) is retried once on its own, honoring Retry-After
 
 ## How it works
 
@@ -35,6 +38,8 @@ A small pipeline runs on every matching order event:
 4. **JSON filtering** — reduces it to the fields you selected
 5. **Authenticated request** — sends it via the configured HTTP method and auth
 6. **Logging** — records status code, payload, response, and latency
+
+If the receiving end returns a transient error, the call is retried once in the background. Email destinations follow the same pipeline, delivering the order summary by email instead of an HTTP request.
 
 (This is the same lifecycle exposed by the plugin's Debug Mode logging.)
 
@@ -68,13 +73,13 @@ Any REST API that accepts HTTP requests, including:
 4. _(Optional)_ Use the JSON Filter to select which order fields to send
 5. Place a test WooCommerce order and check the **API Logs** to confirm delivery
 
-## Free vs Pro
+## Free vs Lite
 
 The free version is fully functional — not a crippled demo:
 
-- 1 API integration, 3 order triggers, unlimited API calls (throttled after 500/month), real-time logs for the last 10 calls
+- 1 API Key, the three main order triggers, unlimited API calls (throttled after 500/month), a real-time API Log of your last 10 calls, and the ready-made Email template
 
-[**AnyAPI Pro**](https://anyapiplugin.com/pricing/) (from $79/year) adds more credentials, all order triggers, the JSON Filter, full API Log search and statistics, integration templates, and priority support.
+[**AnyAPI Lite**](https://anyapiplugin.com/pricing/) (from $79/year) adds the JSON Filter, a full searchable API Log, more order triggers, multiple email recipients, and direct email support.
 
 ## Requirements
 

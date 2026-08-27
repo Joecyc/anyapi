@@ -272,6 +272,7 @@ class ApiKeyHandler {
         'toggle_success' => __( 'Status updated.', 'anyapi' ),
         'save_error'     => __( 'Failed to save. Please check your inputs.', 'anyapi' ),
         'limit_reached'  => __( 'API Key limit reached. Upgrade to add more.', 'anyapi' ),
+        'key_limit_locked' => __( 'Starter includes one API Key. Lite gives you five, so each service you connect can keep its own credentials.', 'anyapi' ),
         'confirm_delete' => __( 'Delete this key? Integrations using it will stop working.', 'anyapi' ),
         'in_use_error'   => __( 'Cannot delete: this key is in use by active integrations.', 'anyapi' ),
         'new_key_title'  => __( 'New API Key', 'anyapi' ),

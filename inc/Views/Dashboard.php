@@ -18,12 +18,16 @@ class Dashboard {
   // ── Header ─────────────────────────────────────────────────────────────────
 
   public function dashboardHeader( $args ) {
-    ?>
-    <?php self::showBanner(); ?>
+    self::showBanner();
+    self::brandHeader();
+  }
 
+  public function brandHeader() {
+    ?>
     <div id="anyapi-dashboard-header">
       <div class="anyapi-header-left">
-        <span class="anyapi-logo-name">Any<span>API</span></span>
+        <img id="anyapi-brand-logo" src="<?php echo esc_url( Anyapi::getImages( 'logo-light' ) ); ?>" alt="AnyAPI" class="anyapi-brand-logo">
+        <span class="anyapi-logo-name-slot"></span>
       </div>
       <div class="anyapi-header-right">
         <button type="button" id="dark-mode-toggle" class="dark-mode-toggle"
@@ -112,6 +116,9 @@ class Dashboard {
 
   public function dashboardContent( $args ) {
 
+    $integrations        = get_option( 'anyapi_wc_orderapi', array() );
+    $has_no_integrations = empty( $integrations );
+
     $plan       = PlanHelper::currentPlan();
     $limits     = PlanHelper::currentLimits();
     $used_calls = PlanHelper::usedCallsThisMonth();
@@ -192,9 +199,73 @@ class Dashboard {
 
       <div class="anyapi-main-content">
         <?php self::versionCard(); ?>
+        <?php if ( $has_no_integrations ) : self::onboardingPanel(); endif; ?>
         <?php self::statusCard(); ?>
         <?php self::chartCard(); ?>
-        <?php self::logSection(); ?>
+        <?php self::logSection( $has_no_integrations ); ?>
+      </div>
+
+    </div>
+    <?php
+  }
+
+  // ── Onboarding Panel (zero integrations) ────────────────────────────────────
+
+  public function onboardingPanel(): void {
+
+    $template_url = admin_url( 'admin.php?page=anyapi_templates' );
+    $manual_url   = admin_url( 'admin.php?page=anyapi_orderapi' );
+    $guide_url    = anyapi_utm_url( 'https://anyapiplugin.com/documentation', 'dashboard', 'onboarding' );
+
+    $steps = array(
+      array(
+        'title' => __( 'Pick a template', 'anyapi' ),
+        'desc'  => __( 'Start from a ready-made preset for a common use case.', 'anyapi' ),
+      ),
+      array(
+        'title' => __( 'Add your destination', 'anyapi' ),
+        'desc'  => __( "Enter the email, URL, or API key you're sending orders to.", 'anyapi' ),
+      ),
+      array(
+        'title' => __( 'Save & go live', 'anyapi' ),
+        'desc'  => __( 'Your next order automatically triggers the integration.', 'anyapi' ),
+      ),
+    );
+    ?>
+    <div class="anyapi-onboarding-panel">
+
+      <div class="aop-header">
+        <div class="aop-icon" aria-hidden="true">🚀</div>
+        <div class="aop-heading">
+          <h2 class="aop-title"><?php esc_html_e( 'Set up your first integration', 'anyapi' ); ?></h2>
+          <p class="aop-subcopy">
+            <?php esc_html_e( 'Connect a WooCommerce order event to an API, Slack channel, or email — no code required.', 'anyapi' ); ?>
+          </p>
+        </div>
+      </div>
+
+      <div class="aop-steps">
+        <?php foreach ( $steps as $i => $step ) : ?>
+        <div class="aop-step">
+          <div class="aop-step-badge"><?php echo esc_html( $i + 1 ); ?></div>
+          <div class="aop-step-body">
+            <div class="aop-step-title"><?php echo esc_html( $step['title'] ); ?></div>
+            <div class="aop-step-desc"><?php echo esc_html( $step['desc'] ); ?></div>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+
+      <div class="aop-actions">
+        <a href="<?php echo esc_url( $template_url ); ?>" class="aop-btn-primary">
+          🧩 <?php esc_html_e( 'Start from a template →', 'anyapi' ); ?>
+        </a>
+        <a href="<?php echo esc_url( $manual_url ); ?>" class="aop-btn-secondary">
+          <?php esc_html_e( 'or build manually →', 'anyapi' ); ?>
+        </a>
+        <a href="<?php echo esc_url( $guide_url ); ?>" class="aop-btn-tertiary" target="_blank" rel="noopener">
+          📖 <?php esc_html_e( 'View quick-start guide →', 'anyapi' ); ?>
+        </a>
       </div>
 
     </div>
@@ -463,7 +534,7 @@ class Dashboard {
 
   // ── Log Section ────────────────────────────────────────────────────────────
 
-  public function logSection() {
+  public function logSection( bool $has_no_integrations = false ) {
 
     $plan        = PlanHelper::currentPlan();
     $upgrade_url = admin_url( 'admin.php?page=anyapi_settings#plan' );
@@ -480,11 +551,11 @@ class Dashboard {
             <strong class="al-log-title"><?php esc_html_e( 'Real-Time API Log', 'anyapi' ); ?></strong>
             <span class="al-log-limit-note">
               <?php esc_html_e( 'Last 10 calls', 'anyapi' ); ?> &mdash;
-              <a href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade for full log', 'anyapi' ); ?></a>
+              <a href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Lite keeps every call', 'anyapi' ); ?></a>
             </span>
           </div>
           <div class="al-search-locked" tabindex="0" role="button"
-               aria-label="<?php esc_attr_e( 'Search requires Lite', 'anyapi' ); ?>"
+               aria-label="<?php esc_attr_e( 'Search your full history with Lite', 'anyapi' ); ?>"
                onclick="this.closest('#anyapi-logs-section').querySelector('.al-search-prompt').style.display='flex';this.style.display='none';">
             <span class="al-placeholder-text"><?php esc_html_e( 'Search logs…', 'anyapi' ); ?></span>
             <span class="al-lock-chip">&#128274; Lite</span>
@@ -494,7 +565,7 @@ class Dashboard {
         <div class="al-search-prompt" style="display:none;">
           <span aria-hidden="true">&#128269;</span>
           <span>
-            <?php esc_html_e( 'Search across all logs with Lite', 'anyapi' ); ?> &mdash;
+            <?php esc_html_e( 'Find any order, URL or payload in seconds — with Lite', 'anyapi' ); ?>
             <a href="<?php echo esc_url( $upgrade_url ); ?>" class="al-prompt-link">$79/yr &rarr;</a>
           </span>
           <button type="button" class="al-prompt-close"
@@ -519,6 +590,16 @@ class Dashboard {
                 <tr>
                   <td colspan="6" style="text-align:center;padding:32px;color:var(--anyapi-text-muted);">
                     <?php esc_html_e( 'No API logs yet. Trigger a WooCommerce order to see activity.', 'anyapi' ); ?>
+                    <?php if ( $has_no_integrations ) : ?>
+                      <br>
+                      <?php
+                      printf(
+                        /* translators: %s: link to the Templates page */
+                        esc_html__( "Don't have an integration yet? %s", 'anyapi' ),
+                        '<a href="' . esc_url( admin_url( 'admin.php?page=anyapi_templates' ) ) . '">🧩 ' . esc_html__( 'Start from a template →', 'anyapi' ) . '</a>'
+                      );
+                      ?>
+                    <?php endif; ?>
                   </td>
                 </tr>
               <?php else : ?>
@@ -578,7 +659,7 @@ class Dashboard {
           </div>
           <div class="al-blur-overlay">
             <a href="<?php echo esc_url( $upgrade_url ); ?>" class="al-upgrade-btn">
-              <?php esc_html_e( 'See your success rate → Upgrade to Lite', 'anyapi' ); ?>
+              <?php esc_html_e( 'See how many calls succeed and which ones fail — with Lite', 'anyapi' ); ?>
             </a>
           </div>
         </div>
@@ -697,7 +778,7 @@ class Dashboard {
         <div class="avb-body">
           <span class="avb-title">
             <?php esc_html_e( 'Could not check for updates. Verify your connection or', 'anyapi' ); ?>
-            <a href="https://anyapiplugin.com/changelog" target="_blank" rel="noopener">
+            <a href="https://wordpress.org/plugins/anyapi/#developers" target="_blank" rel="noopener">
               <?php esc_html_e( 'view changelog →', 'anyapi' ); ?>
             </a>
           </span>

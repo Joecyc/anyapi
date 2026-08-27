@@ -50,6 +50,11 @@ class OrderIntegrations {
     // scheduling; we just execute the deferred HTTP call directly.
     add_action( 'anyapi_fire_integration', array( $this, 'handleThrottledFire' ), 10, 2 );
 
+    // Single Cron retry for transient HTTP failures (429/502/503/504, WP_Error).
+    // Distinct from anyapi_fire_integration so a cap-deferred fire still gets
+    // its own retry chance, while a transient-failure retry never reschedules.
+    add_action( 'anyapi_retry_integration', array( $this, 'handleRetryFire' ), 10, 2 );
+
   }
 
   // =========================================================================
@@ -182,6 +187,26 @@ class OrderIntegrations {
   }
 
   // =========================================================================
+  // handleRetryFire — WP Cron retry entry point (anyapi_retry_integration)
+  // =========================================================================
+
+  /**
+   * Called by WP Cron after a transient HTTP failure (429/502/503/504 or
+   * WP_Error). Delegates to fireIntegration() with the retry marker set so
+   * a second transient failure is logged as final, not rescheduled.
+   *
+   * @param int    $order_id    WooCommerce order ID
+   * @param array  $integration Integration record array (full record, not just ID)
+   */
+  public function handleRetryFire( int $order_id, array $integration ): void {
+    $order = wc_get_order( $order_id );
+    if ( ! $order instanceof \WC_Order ) {
+      return;
+    }
+    $this->fireIntegration( $order, $integration, true );
+  }
+
+  // =========================================================================
   // requestFollowingRedirects — manual 3xx follower with RFC 7231 method rewriting
   // =========================================================================
 
@@ -277,7 +302,7 @@ class OrderIntegrations {
   // fireIntegration — build payload and send HTTP request
   // =========================================================================
 
-  private function fireIntegration( \WC_Order $order, array $integration ): void {
+  private function fireIntegration( \WC_Order $order, array $integration, bool $is_retry = false ): void {
 
     $order_id = $order->get_id();
 
@@ -342,20 +367,47 @@ class OrderIntegrations {
       'payload_preview' => mb_substr( $filtered_payload, 0, 300 ),
     ) );
 
-    // Re-interpolate filtered payload — expert mode returns
-    // raw_json_override which may contain {{variable}} placeholders.
-    if ( $filter_mode === 'expert' && strpos( $filtered_payload, '{{' ) !== false ) {
-      $filtered_payload = $this->interpolatePayload( $filtered_payload, $order );
+    // ── Expert-mode payload integrity ─────────────────────────────────────
+    // raw_json_override is the source of truth for expert mode. If the Lite
+    // filter didn't apply it (callback absent, or plan check failed at fire
+    // time), filtered_payload silently falls back to payload_json — abort
+    // instead of sending a degraded payload.
+    $expert_override = trim( (string) ( $integration['raw_json_override'] ?? '' ) );
+
+    if ( 'expert' === $filter_mode && '' !== $expert_override ) {
+
+      if ( $filtered_payload !== $payload_json ) {
+        $filtered_payload = $this->interpolatePayload( $filtered_payload, $order );
+      } else {
+        \Anyapi\AnyapiDebug::log( 'filter', 'Expert override not applied; aborting fire', array(
+          'integration_id' => $integration['id'] ?? '',
+          'filter_mode'    => $filter_mode,
+        ) );
+
+        $this->writeLog( array(
+          'order_id'  => $order_id,
+          'http_code' => 0,
+          'status'    => 'error',
+          'trigger'   => $integration['trigger'],
+          'method'    => $integration['http_method'] ?? 'POST',
+          'api_url'   => $integration['api_url'] ?? '',
+          'payload'   => $filtered_payload,
+          'response'  => 'Expert override not applied — fire aborted',
+          'latency'   => null,
+        ) );
+
+        return;
+      }
     }
 
     // ── Email destination ───────────────────────────────────────────────────
+    // Returns before the HTTP send block below, so the retry logic never applies to email.
     $destination_type = $integration['destination_type'] ?? 'url';
     if ( 'email' === $destination_type ) {
       $to      = $this->interpolateOrderId( $integration['email_to'] ?? '', $order_id );
       $subject = $this->interpolateOrderId( $integration['email_subject'] ?? '', $order_id );
-      $body    = trim( (string) ( $integration['email_preamble'] ?? '' ) );
-      $summary = $this->buildOrderSummary( $order_id );
-      $body    = ( '' !== $body ) ? $body . "\n\n" . $summary : $summary;
+      $body = trim( (string) ( $integration['email_preamble'] ?? '' ) );
+      $body = $this->interpolateEmailBody( $body, $order_id );
 
       $start   = microtime( true );
       $sent    = wp_mail( $to, $subject, $body );
@@ -418,15 +470,18 @@ class OrderIntegrations {
 
     $latency_ms = (int) round( ( microtime( true ) - $start_time ) * 1000 );
 
+    $is_error_response = is_wp_error( $response );
+    $resp_code          = $is_error_response ? 0 : wp_remote_retrieve_response_code( $response );
+    $is_transient       = $is_error_response || in_array( $resp_code, array( 429, 502, 503, 504 ), true );
+
     // Debug log
-    if ( is_wp_error( $response ) ) {
+    if ( $is_error_response ) {
       \Anyapi\AnyapiDebug::log( 'fire', 'HTTP error (WP_Error)', array(
         'integration_id' => $integration['id'] ?? '',
         'url'            => $final_url,
         'error_message'  => $response->get_error_message(),
       ) );
     } else {
-      $resp_code = wp_remote_retrieve_response_code( $response );
       $resp_body = wp_remote_retrieve_body( $response );
       \Anyapi\AnyapiDebug::log( 'fire', 'HTTP response', array(
         'integration_id' => $integration['id'] ?? '',
@@ -437,10 +492,34 @@ class OrderIntegrations {
       ) );
     }
 
+    // Transient failure on the first attempt: schedule one Cron retry instead
+    // of logging now. WP Cron is not a precise timer — the retry fires on the
+    // next tick at/after the delay, not exactly at it.
+    if ( $is_transient && ! $is_retry ) {
+      $delay = 60;
+      if ( ! $is_error_response ) {
+        $retry_after = wp_remote_retrieve_header( $response, 'retry-after' );
+        if ( is_numeric( $retry_after ) ) {
+          $delay = min( 300, max( 1, (int) $retry_after ) );
+        }
+      }
+
+      \Anyapi\AnyapiDebug::log( 'fire', 'Transient failure — scheduling retry', array(
+        'integration_id' => $integration['id'] ?? '',
+        'http_code'      => $resp_code,
+        'delay_seconds'  => $delay,
+      ) );
+
+      wp_schedule_single_event( time() + $delay, 'anyapi_retry_integration', array( $order_id, $integration ) );
+      return;
+    }
+
     // ── Log result ────────────────────────────────────────────────────────
     // Log the final method/URL after redirects, not the originally configured
     // ones, so the log reflects what actually happened over the wire.
-    if ( is_wp_error( $response ) ) {
+    $retry_note = $is_retry ? sprintf( ' (retried after %s)', $is_error_response ? 'connection error' : $resp_code ) : '';
+
+    if ( $is_error_response ) {
       $this->writeLog( array(
         'order_id'  => $order_id,
         'http_code' => 0,
@@ -449,24 +528,23 @@ class OrderIntegrations {
         'method'    => $final_method,
         'api_url'   => $final_url,
         'payload'   => $filtered_payload,
-        'response'  => $response->get_error_message(),
+        'response'  => $response->get_error_message() . $retry_note,
         'latency'   => null,
       ) );
       return;
     }
 
-    $http_code = wp_remote_retrieve_response_code( $response );
-    $status    = ( $http_code >= 200 && $http_code < 300 ) ? 'success' : 'error';
+    $status = ( $resp_code >= 200 && $resp_code < 300 ) ? 'success' : 'error';
 
     $this->writeLog( array(
       'order_id'  => $order_id,
-      'http_code' => $http_code,
+      'http_code' => $resp_code,
       'status'    => $status,
       'trigger'   => $integration['trigger'],
       'method'    => $final_method,
       'api_url'   => $final_url,
       'payload'   => $filtered_payload,
-      'response'  => wp_remote_retrieve_body( $response ),
+      'response'  => wp_remote_retrieve_body( $response ) . $retry_note,
       'latency'   => $latency_ms,
     ) );
 
@@ -619,6 +697,35 @@ class OrderIntegrations {
    */
   private function interpolateOrderId( string $text, int $order_id ): string {
     return str_replace( '{{order_id}}', (string) $order_id, $text );
+  }
+
+  /**
+   * Interpolate the email body against an allow-listed token map.
+   * Starter ships order_summary + order_id only. Lite extends the map via
+   * the anyapi_email_tokens filter — the full payload engine stays out of
+   * the email path by design.
+   */
+  private function interpolateEmailBody( string $body, int $order_id ): string {
+    if ( '' === $body ) {
+      return $body;
+    }
+
+    $tokens = array(
+      'order_id' => (string) $order_id,
+    );
+
+    // Only build the summary when the token is actually used.
+    if ( false !== strpos( $body, '{{order_summary}}' ) ) {
+      $tokens['order_summary'] = $this->buildOrderSummary( $order_id );
+    }
+
+    $tokens = apply_filters( 'anyapi_email_tokens', $tokens, $order_id, $body );
+
+    foreach ( $tokens as $key => $value ) {
+      $body = str_replace( '{{' . $key . '}}', (string) $value, $body );
+    }
+
+    return $body;
   }
 
   /**

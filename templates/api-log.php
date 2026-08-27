@@ -6,6 +6,8 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+( new \Anyapi\Views\Dashboard() )->brandHeader();
+
 $plan        = \Anyapi\PlanHelper::currentPlan();
 $limits      = \Anyapi\PlanHelper::currentLimits();
 $is_starter  = ( $plan === 'starter' );
@@ -22,7 +24,7 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
       <h1 class="al-title">📋 <?php esc_html_e( 'API Logs', 'anyapi' ); ?></h1>
       <p class="al-desc">
         <?php if ( $is_starter ) : ?>
-          <?php esc_html_e( 'Real-time log of your last 10 API calls. Upgrade to Lite for full history, search, and analytics.', 'anyapi' ); ?>
+          <?php esc_html_e( 'Showing your last 10 API calls, live. Lite keeps every call you\'ve ever made.', 'anyapi' ); ?>
         <?php else : ?>
           <?php esc_html_e( 'Monitor all outgoing API calls triggered by WooCommerce orders.', 'anyapi' ); ?>
         <?php endif; ?>
@@ -56,7 +58,7 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
     <!-- Blur overlay -->
     <div class="al-stats-blur-overlay">
       <a href="<?php echo esc_url( $upgrade_url ); ?>" class="al-upgrade-cta" target="_blank" rel="noopener">
-        📊 <?php esc_html_e( 'See your success rate → Upgrade to Lite', 'anyapi' ); ?>
+        📊 <?php esc_html_e( 'See how many calls succeed and which ones fail — with Lite', 'anyapi' ); ?>
       </a>
     </div>
   </div>
@@ -70,9 +72,9 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
         class="al-search"
         placeholder="<?php esc_attr_e( 'Search Order ID, URL, payload…', 'anyapi' ); ?>"
         readonly
-        aria-label="<?php esc_attr_e( 'Search locked — upgrade to Lite', 'anyapi' ); ?>"
+        aria-label="<?php esc_attr_e( 'Search your full history with Lite', 'anyapi' ); ?>"
       >
-      <a href="<?php echo esc_url( $upgrade_url ); ?>" class="al-search-lock-badge" target="_blank" rel="noopener">
+      <a href="<?php echo esc_url( $upgrade_url ); ?>" class="al-search-lock-badge" target="_blank" rel="noopener" title="<?php esc_attr_e( 'Find any order, URL or payload in seconds — with Lite', 'anyapi' ); ?>">
         🔒 <?php esc_html_e( 'Lite+', 'anyapi' ); ?>
       </a>
     </div>
@@ -190,7 +192,7 @@ $upgrade_url = esc_url( $limits['upgrade_url'] );
     <!-- Upgrade nudge bar -->
     <div class="al-starter-upgrade-bar">
       <span class="al-starter-upgrade-bar__text">
-        🔒 <?php esc_html_e( 'Showing last 10 calls only. Full history, search & analytics on Lite+.', 'anyapi' ); ?>
+        ⚡ <?php esc_html_e( 'Keep every call, search any order, catch failures early.', 'anyapi' ); ?>
       </span>
       <a href="<?php echo esc_url( $upgrade_url ); ?>" class="al-btn al-btn--primary al-btn--sm" target="_blank" rel="noopener">
         ⚡ <?php esc_html_e( 'Upgrade to Lite', 'anyapi' ); ?> &rarr;

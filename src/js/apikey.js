@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const typeInput = document.getElementById("ak-type");
   const typeBtns = document.querySelectorAll(".ak-type-btn");
   const tokenInput = document.getElementById("ak-token");
+  const akLicenseWarn = document.getElementById("ak-token-license-warning");
   const userInput = document.getElementById("ak-username");
   const passInput = document.getElementById("ak-password");
   const statusCheck = document.getElementById("ak-status");
@@ -49,6 +50,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // =========================================================================
   // Helpers
   // =========================================================================
+
+  // License-key mis-paste guard (client-side warning only).
+  // Warns when a value resembling an AnyAPI license key
+  // (ANYAPI-XXXX-XXXX-...) is entered into the external-service token field.
+  const akLicenseRe = /^\s*ANYAPI-[A-Z0-9]{4,}/i;
+  function akCheckLicensePaste() {
+    if (!tokenInput || !akLicenseWarn) return;
+    akLicenseWarn.style.display = akLicenseRe.test(tokenInput.value)
+      ? "block"
+      : "none";
+  }
+  tokenInput?.addEventListener("input", akCheckLicensePaste);
+  tokenInput?.addEventListener("blur", akCheckLicensePaste);
 
   function clearErrors() {
     document
@@ -104,9 +118,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Gate the Add button
     if (addBtn) {
       const hit = pct >= 100;
-      addBtn.disabled = hit;
-      addBtn.dataset.limitHit = hit ? "1" : "0";
-      addBtn.classList.toggle("is-disabled", hit);
+      addBtn.dataset.locked = hit ? "1" : "0";
+      addBtn.classList.toggle("is-locked", hit);
+      addBtn.setAttribute("aria-disabled", hit ? "true" : "false");
     }
   }
 
@@ -117,6 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function openForm(mode = "new", cardData = null) {
     clearErrors();
     setFormStatus("");
+    if (akLicenseWarn) akLicenseWarn.style.display = "none";
 
     if (mode === "new") {
       formTitle.textContent = cfg.i18n?.new_key_title || "New API Key";
@@ -161,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
       formWrap.setAttribute("aria-hidden", "true");
       formWrap.classList.remove("is-closing");
       clearErrors();
+      if (akLicenseWarn) akLicenseWarn.style.display = "none";
     }, 200);
   }
 
@@ -210,10 +226,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // =========================================================================
 
   function handleAddClick() {
-    if (addBtn?.dataset.limitHit === "1") {
-      // Soft-block: show inline message or redirect
-      const url = cfg.upgrade_url;
-      if (url) window.open(url, "_blank", "noopener");
+    if (addBtn?.dataset.locked === "1") {
+      openUpgradeModal();
       return;
     }
     openForm("new");
@@ -529,4 +543,35 @@ document.addEventListener("DOMContentLoaded", function () {
       emptyEl.remove();
     }
   }
+
+  // =========================================================================
+  // Upgrade Modal
+  // =========================================================================
+
+  const upgradeModal = document.getElementById("anyapi-apikey-upgrade-modal");
+  const modalBody = document.getElementById("ak-modal-body");
+  const modalCloseBtn = upgradeModal?.querySelector(".upgrade-modal__close");
+  const modalBackdrop = upgradeModal?.querySelector(".upgrade-modal__backdrop");
+
+  function openUpgradeModal() {
+    if (!upgradeModal) return;
+    if (modalBody) modalBody.textContent = cfg.i18n?.key_limit_locked || "";
+
+    upgradeModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    setTimeout(() => modalCloseBtn?.focus(), 50);
+  }
+
+  function closeUpgradeModal() {
+    if (!upgradeModal) return;
+    upgradeModal.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  modalCloseBtn?.addEventListener("click", closeUpgradeModal);
+  modalBackdrop?.addEventListener("click", closeUpgradeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && upgradeModal?.style.display === "flex")
+      closeUpgradeModal();
+  });
 });

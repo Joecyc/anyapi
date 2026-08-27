@@ -6,11 +6,54 @@ All notable changes to this plugin will be documented in this file.
 
 ## [Unreleased]
 
-### Architecture
 ### Added
 ### Changed
-### Removed
 ### Fixed
+
+---
+
+## [2.0.5] (2026-08-22)
+
+### Added
+- New: Integration Templates — pick the Email template to open a prefilled integration wizard right on the Templates page. Slack, Google Sheets and Courier/Logistics API templates available on Lite. (F-11)
+- New: failed order integrations now automatically retry once after transient errors (HTTP 429/502/503/504 or connection failures), honoring Retry-After when present. (F-14)
+- The API Key form now warns when a value resembling an AnyAPI license key is entered in the token field, pointing users to the License page to reduce activation mis-paste (INC-9 follow-up).
+- Order Integrations list: added a Key column and an in-place expandable row per integration showing details (method, auth, full endpoint, filter content); Toggle, Edit, Delete and expand-caret stay in the main row's Actions column. Integrations created from a template are now labeled. (U-12)
+- Added: creation timestamp shown in the expanded row (U-12).
+### Changed
+- Settings: Features list now shows Integration Templates (Starter: 1, Lite+: all 4); added Templates to Quick Navigation. Webhook Receiver hidden until built.
+- Settings: Features list now also shows Email Destinations (Starter: 1, Lite: 3, Plus/Agency: unlimited).
+- Dashboard: new users now see a "Set up your first integration" panel with a template CTA when they have zero integrations configured; the API log empty state links to Templates too.
+- Settings: the Plugin Info card now shows AnyAPI Lite's version and update status when Lite is active.
+- Admin header: replaced the text wordmark with the brand icon (red-dot detail, light/dark mode aware); the branded header now appears on every AnyAPI admin page, not just Dashboard.
+- Reordered row actions to Toggle/Edit/Delete/Expand (U-12).
+- Email destination body now interpolates an allow-listed token map ({{order_summary}}, {{order_id}}), extensible by Lite via the anyapi_email_tokens filter. The order summary is no longer appended unconditionally. (D-33)
+- Free plan: email integrations are now created from the Email template; the manual wizard's Email destination opens an upgrade modal offering the template path. (D-33)
+- Upgrade modal supports an optional primary action button. (D-33)
+- API Log page: rewrote the Starter upgrade prompts (page description, stats blur CTA, search lock, nudge bar) around what Lite unlocks rather than what's missing. (205)
+- API Keys page: added a note explaining the key limit when hit, pointing to editing the existing key instead of only upgrading. (205)
+- Order integrations: the email destination limit message now mentions editing or removing the existing integration, not just upgrading. (205)
+- Settings: Integration Templates note now says the Slack, Google Sheets and Courier API templates are coming soon. (205)
+- Dashboard log widget now uses the same upgrade wording as the API Log page. (205)
+- Reworked upgrade prompts across Order Integrations, Integration Templates, JSON Filter and API Keys: plainer wording, added email destination limits to the plan comparison, and repositioned unbuilt templates as "coming soon". (205)
+- Trigger-locked upgrade modal message now breaks onto two lines for readability. (205)
+- API Keys page: replaced the disabled Add button with the shared locked-button pattern; clicking it while at the key limit now opens an upgrade modal instead of doing nothing.
+### Fixed
+- Hide unbuilt Slack, Google Sheets and Courier API template cards from the Starter Templates page and Settings until they ship (compliance).
+- PCP compliance: add direct-file-access (ABSPATH) guard to inc/PlanHelper.php; bump readme.txt "Tested up to" to 7.1.
+- Dark mode: Dashboard and Integration Templates page titles are now readable.
+- U-8: Dark mode no longer flashes the light theme on page load.
+- Expert-mode integrations no longer silently send an empty {} payload when the advanced filter fails to apply; such fires are now logged as errors instead of a false success (F-20).
+- Email template: choose Default or Custom inside the wizard; Step 1 now shows email-specific guidance; removed a misleading {{order_id}} hint on the recipient field. (F-11)
+- Simplified the Email template to a single one-click prefill (removed the Default/Custom toggle). (F-11)
+- Edit button moved back to the main row's Actions column — no longer requires expanding the row first (U-12).
+- Fixed: basic-mode filter payload was not displaying in the expanded row (U-12).
+- [T-1] Route plugins-list "Get AnyAPI Lite" and "Docs" links through anyapi_utm_url() (new utm_medium=plugins_list).
+- [T-1] Fix redirect loop on documentation links: anyapi_utm_url() now normalises the base URL with a trailing slash (also fixes the Dashboard and Settings docs links shipped in 2.0.4).
+- [T-1] Fix dead changelog link in the Dashboard version card's version-check-failed state; now points to the wordpress.org changelog.
+- [T-1] Fix Docs link being injected into the AnyAPI Lite plugin row; plugin_row_meta now matches on the plugin file instead of meta text.
+- Fixed three "API Keys" links using the wrong page slug (anyapi-apikey instead of anyapi_apikey) in the order wizard, Settings, and REST API tester. (205)
+- Corrected the upgrade modal's Lite plan comparison: 3 Email Destinations, not unlimited. (205)
 
 ---
 

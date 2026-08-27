@@ -74,6 +74,9 @@ class OrderIntegrationHandler {
     $email_subject  = sanitize_text_field( wp_unslash( $_POST['email_subject'] ?? '' ) );
     $email_preamble = sanitize_textarea_field( wp_unslash( $_POST['email_preamble'] ?? '' ) );
 
+    $created_via = sanitize_key( wp_unslash( $_POST['created_via'] ?? '' ) );
+    $created_via = in_array( $created_via, array( 'template', 'manual' ), true ) ? $created_via : 'manual';
+
     // ── Plan data ─────────────────────────────────────────────────────────
 
     $limits = \Anyapi\PlanHelper::currentLimits();
@@ -176,7 +179,7 @@ class OrderIntegrationHandler {
         }
         if ( $email_count >= $limits_email ) {
           wp_send_json_error( array(
-            'message'     => __( 'The Free plan allows 1 email destination. Upgrade for more.', 'anyapi' ),
+            'message'     => __( 'You already have an email integration running. Edit or remove it to send to a different recipient, or move to Lite to run several at once.', 'anyapi' ),
             'gate'        => 'email_destinations',
             'upgrade_url' => $limits['upgrade_url'],
           ), 403 );
@@ -208,6 +211,7 @@ class OrderIntegrationHandler {
       $record['email_to']            = $email_to;
       $record['email_subject']       = $email_subject;
       $record['email_preamble']      = $email_preamble;
+      $record['created_via']         = $created_via;
       $record['updated_at']          = $now;
 
     } else {
@@ -231,6 +235,7 @@ class OrderIntegrationHandler {
         'email_to'           => $email_to,
         'email_subject'      => $email_subject,
         'email_preamble'     => $email_preamble,
+        'created_via'        => $created_via,
         'status'             => 'active',
         'created_at'         => $now,
         'updated_at'         => $now,
@@ -394,6 +399,7 @@ class OrderIntegrationHandler {
       'plan'              => $plan,
       'plan_label'        => $limits['label'],
       'upgrade_url'       => $limits['upgrade_url'],
+      'order_api_url'     => admin_url( 'admin.php?page=anyapi_orderapi' ),
       'limits'            => array(
         'monthly_calls'     => $call_limit,
         'json_filter'       => $limits['json_filter'],
@@ -404,20 +410,24 @@ class OrderIntegrationHandler {
         'calls_this_month'  => $used,
       ),
       'api_keys'          => $key_list,    // for Step 1 dropdown
+      'templatesUrl'      => admin_url( 'admin.php?page=anyapi_templates' ),
       'i18n'              => array(
         'save_success'      => __( 'Integration saved successfully!', 'anyapi' ),
         'save_error'        => __( 'Failed to save. Please check your inputs.', 'anyapi' ),
         'delete_confirm'    => __( 'Delete this integration? This cannot be undone.', 'anyapi' ),
         'delete_success'    => __( 'Integration deleted.', 'anyapi' ),
         'toggle_success'    => __( 'Status updated.', 'anyapi' ),
-        'trigger_locked'    => __( 'This trigger is available on Lite plan and above.', 'anyapi' ),
-        'filter_locked'     => __( 'JSON Filter is available on Lite plan and above.', 'anyapi' ),
+        'trigger_locked'    => __( "Starter fires on three order events — Watch Orders, New Order and Processing.\nLite adds the other six.", 'anyapi' ),
+        'filter_locked'     => __( 'Basic sends the full order object. Advanced and Expert let you pick or rewrite the fields — both run on Lite.', 'anyapi' ),
         'monthly_limit_hit' => __( 'Monthly call limit reached (500/mo on Free plan). Upgrade to continue.', 'anyapi' ),
         'upgrade_cta'       => __( 'Upgrade Now →', 'anyapi' ),
         'saving'            => __( 'Saving…', 'anyapi' ),
         'deleting'          => __( 'Deleting…', 'anyapi' ),
         'loading'           => __( 'Loading…', 'anyapi' ),
         'no_api_key'        => __( 'No authentication (public API)', 'anyapi' ),
+        'email_dest_locked' => __( 'Starter sets up email from a ready-made template — recipient, subject and order summary come pre-filled. Building one from scratch, with tokens in the message body, runs on Lite.', 'anyapi' ),
+        'email_dest_title'  => __( 'Email starts from a template', 'anyapi' ),
+        'go_to_templates'   => __( 'Go to Templates →', 'anyapi' ),
       ),
     );
   }
@@ -455,6 +465,8 @@ class OrderIntegrationHandler {
     $r['email_subject']    ??= '';
     $r['email_preamble']   ??= '';
 
+    $r['created_via'] = in_array( $r['created_via'] ?? '', array( 'template', 'manual' ), true ) ? $r['created_via'] : 'manual';
+
     return $r;
   }
 
@@ -469,9 +481,16 @@ class OrderIntegrationHandler {
       'api_key_id'  => $r['api_key_id']  ?? '',  // [CHANGED from api_key]
       'destination_type' => $r['destination_type'] ?? 'url',
       'email_to'          => $r['email_to'] ?? '',
+      'email_subject'     => $r['email_subject'] ?? '',
+      'email_preamble'    => $r['email_preamble'] ?? '',
       'trigger'     => $r['trigger'],
       'http_method' => $r['http_method'] ?? 'POST',
       'filter_mode' => $r['filter_mode'],
+      'payload'           => $r['payload'] ?? '',
+      'selected_fields'   => $r['selected_fields'] ?? array(),
+      'field_order'       => $r['field_order'] ?? array(),
+      'raw_json_override' => $r['raw_json_override'] ?? '',
+      'created_via' => $r['created_via'] ?? 'manual',
       'status'      => $r['status'],
       'created_at'  => $r['created_at'],
       'updated_at'  => $r['updated_at'],

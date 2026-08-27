@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const thumbIcon = toggleBtn
     ? toggleBtn.querySelector(".dm-thumb-icon")
     : null;
+  const brandLogo = document.getElementById("anyapi-brand-logo");
 
   /**
    * Apply theme to <body>.
@@ -60,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function applyTheme(theme) {
     const isDark = theme === "dark";
     document.body.classList.toggle(DARK_CLASS, isDark);
+    document.documentElement.classList.toggle(DARK_CLASS, isDark);
     // Update thumb emoji: sun in light, moon in dark
     if (thumbIcon) {
       thumbIcon.textContent = isDark ? "\uD83C\uDF19" : "\u2600\uFE0F";
@@ -67,6 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Accessibility: aria-pressed reflects current state
     if (toggleBtn) {
       toggleBtn.setAttribute("aria-pressed", String(isDark));
+    }
+    // Swap brand icon to match theme
+    if (brandLogo) {
+      const src = isDark ? cfg.logo_dark : cfg.logo_light;
+      if (src) brandLogo.src = src;
     }
   }
 

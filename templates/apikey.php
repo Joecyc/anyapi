@@ -7,6 +7,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+( new \Anyapi\Views\Dashboard() )->brandHeader();
+
 // ── Plan data ────────────────────────────────────────────────────────────────
 $plan       = \Anyapi\PlanHelper::currentPlan();
 $limits     = \Anyapi\PlanHelper::currentLimits();
@@ -22,6 +24,53 @@ $keys = get_option( 'anyapi_wc_apikey', array() );
 ?>
 
 <div id="anyapi-apikey" class="wrap anyapi-page">
+
+  <!-- ======================================================================
+       Upgrade Modal
+  ====================================================================== -->
+  <div id="anyapi-apikey-upgrade-modal" class="upgrade-modal" role="dialog" aria-modal="true"
+       aria-labelledby="ak-modal-title" style="display:none;">
+    <div class="upgrade-modal__backdrop"></div>
+    <div class="upgrade-modal__box">
+      <button class="upgrade-modal__close" type="button" aria-label="Close">×</button>
+      <div class="upgrade-modal__icon">🚀</div>
+      <h2 class="upgrade-modal__title" id="ak-modal-title"><?php esc_html_e( 'Available on Lite', 'anyapi' ); ?></h2>
+      <p class="upgrade-modal__body" id="ak-modal-body"></p>
+      <div class="upgrade-modal__plans">
+        <div class="modal-plan modal-plan--current">
+          <div class="modal-plan__badge"><?php esc_html_e( 'Current', 'anyapi' ); ?></div>
+          <div class="modal-plan__name">Free</div>
+          <div class="modal-plan__price">$0</div>
+          <ul class="modal-plan__features">
+            <li class="feat--yes">1 API Key</li>
+            <li class="feat--yes">1 Email Destination</li>
+            <li class="feat--yes">3 Triggers</li>
+            <li class="feat--yes">500 API Calls/mo (throttled after limit)</li>
+            <li class="feat--yes">Real-time Log</li>
+            <li class="feat--no">JSON Filter</li>
+            <li class="feat--no">Log Search &amp; Stats</li>
+          </ul>
+        </div>
+        <div class="modal-plan modal-plan--highlight">
+          <div class="modal-plan__badge modal-plan__badge--pro">Most Popular</div>
+          <div class="modal-plan__name">Lite</div>
+          <div class="modal-plan__price">$79<span>/yr</span></div>
+          <ul class="modal-plan__features">
+            <li class="feat--yes">5 API Keys</li>
+            <li class="feat--yes">3 Email Destinations</li>
+            <li class="feat--yes">All Triggers</li>
+            <li class="feat--yes">Unlimited API Calls</li>
+            <li class="feat--yes">Full API Logs</li>
+            <li class="feat--yes">JSON Filter</li>
+            <li class="feat--yes">Log Search &amp; Stats</li>
+          </ul>
+        </div>
+      </div>
+      <a href="<?php echo esc_url( $anyapi_upgrade_url ); ?>" class="upgrade-modal__cta" target="_blank" rel="noopener">
+        <?php esc_html_e( 'See Lite pricing →', 'anyapi' ); ?>
+      </a>
+    </div>
+  </div>
 
   <!-- ======================================================================
        Page header
@@ -56,10 +105,10 @@ $keys = get_option( 'anyapi_wc_apikey', array() );
       <?php endif; ?>
       <button
         id="ak-add-btn"
-        class="ak-btn ak-btn--primary<?php echo $limit_hit ? ' is-disabled' : ''; ?>"
+        class="ak-btn ak-btn--primary<?php echo $limit_hit ? ' is-locked' : ''; ?>"
         type="button"
-        <?php echo $limit_hit ? 'disabled aria-disabled="true"' : ''; ?>
-        data-limit-hit="<?php echo $limit_hit ? '1' : '0'; ?>"
+        <?php echo $limit_hit ? 'aria-disabled="true"' : ''; ?>
+        data-locked="<?php echo $limit_hit ? '1' : '0'; ?>"
         data-upgrade-url="<?php echo esc_url( $anyapi_upgrade_url ); ?>"
       >
         <span class="ak-btn__icon">+</span>
@@ -141,6 +190,9 @@ $keys = get_option( 'anyapi_wc_apikey', array() );
               </button>
             </div>
             <div class="ak-error" id="ak-token-error"></div>
+            <p id="ak-token-license-warning" class="ak-hint" style="display:none;" role="alert">
+              <?php esc_html_e( 'This looks like an AnyAPI license key. License keys are activated on AnyAPI → License, not here. This field is for external service tokens (e.g. Slack, ERP).', 'anyapi' ); ?>
+            </p>
           </div>
         </div>
 
