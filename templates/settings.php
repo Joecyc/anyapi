@@ -75,7 +75,7 @@ $features = array(
     'label'  => __( 'Email Destinations', 'anyapi' ),
     'desc'   => __( 'Send order details directly to an email address', 'anyapi' ),
     'plans'  => array( 'starter', 'lite', 'plus', 'agency' ),
-    'note'   => __( 'Starter: 1 · Lite: 3 · Plus/Agency: Unlimited', 'anyapi' ),
+    'note'   => __( 'Starter: 1 · Lite+: 3', 'anyapi' ),
   ),
   array(
     'icon'   => '⚡',
@@ -96,7 +96,7 @@ $features = array(
     'label'  => __( 'API Keys', 'anyapi' ),
     'desc'   => __( 'Manage Bearer / Basic Auth credentials', 'anyapi' ),
     'plans'  => array( 'starter', 'lite', 'plus', 'agency' ),
-    'note'   => __( 'Starter: 1 key · Lite: 5 · Plus: 20 · Agency: ∞', 'anyapi' ),
+    'note'   => __( 'Starter: 1 key · Lite+: 5', 'anyapi' ),
   ),
   array(
     'icon'   => '🧪',
@@ -273,9 +273,9 @@ $features = array(
             <p class="st-meter__hint <?php echo $call_pct >= 100 ? 'is-throttling' : 'is-warn'; ?>">
               <?php
               if ( $call_pct >= 100 ) {
-                esc_html_e( 'Monthly limit reached. Integrations will fire with a 30-second delay via WP Cron.', 'anyapi' );
+                esc_html_e( 'Your orders are now firing 30 seconds after they come in. Nothing is being dropped — Lite removes the delay.', 'anyapi' );
               } else {
-                esc_html_e( 'Approaching limit. After 500 calls, integrations are throttled (30s delay).', 'anyapi' );
+                esc_html_e( 'You\'re close to 500 calls this month. After that, orders still go through — just 30 seconds later. Lite keeps them instant.', 'anyapi' );
               }
               ?>
               <?php if ( $is_free ) : ?>
@@ -439,6 +439,11 @@ $features = array(
               // translators: %s is the new AnyAPI Lite version number e.g. 1.4.0
               printf( esc_html__( 'AnyAPI Lite %s is available', 'anyapi' ), esc_html( $lite_latest_ver ) ); ?>
             </p>
+            <?php if ( ! empty( $lite_update_obj->changelog ) ) : ?>
+            <div class="st-update-box__changes">
+              <?php echo nl2br( esc_html( $lite_update_obj->changelog ) ); ?>
+            </div>
+            <?php endif; ?>
             <a href="<?php echo esc_url( $lite_update_url ); ?>" class="st-btn st-btn--primary st-btn--sm">
               ⬆ <?php esc_html_e( 'Update Now', 'anyapi' ); ?>
             </a>

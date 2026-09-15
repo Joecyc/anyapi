@@ -1,15 +1,15 @@
-=== AnyAPI – WooCommerce Orders to Any REST API, Webhook & Email ===
+=== AnyAPI – Send Orders to Any REST API, Webhook & Email for WooCommerce ===
 Contributors: anyapi
 Donate link:
 Tags: woocommerce, order notification, email notification, google sheets, erp
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Send WooCommerce order details anywhere it needs to go — an API, a webhook, or email — automatically. No code, every call logged. Start from a template.
+Send order details anywhere — an API, a webhook, or email — automatically. No code, every call logged. Start from a template.
 
 == Description ==
 
@@ -163,6 +163,13 @@ For sending WooCommerce order data to external APIs, you can start on the free v
 8. **Dark mode** — The full AnyAPI admin in dark mode
 
 == Changelog ==
+
+= 2.0.6 (2026-09-17) =
+* Fixed    - Upgrade links across the plugin now behave consistently.
+* Added    - Settings page now shows Lite's changelog when a Lite update is available.
+* Fixed    - Removed an unused internal message that described monthly call limits inaccurately.
+* Changed  - Upgrade prompts now explain what you gain, instead of naming plan limits.
+* Changed  - Feature list no longer references plans that are not yet available.
 
 = 2.0.5 (2026-08-22) =
 * Added    - Integration Templates: a new Templates page lets you open a prefilled setup wizard in one click. The Email template is ready to use on every plan.
